@@ -1,0 +1,9 @@
+[submodule "third-party/glm"]
+	path = third-party/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "third-party/tbb"]
+	path = third-party/tbb
+	url = https://github.com/oneapi-src/oneTBB.git
+[submodule "third-party/stb_image"]
+	path = third-party/stb_image
+	url = https://github.com/nothings/stb.git

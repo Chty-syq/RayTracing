@@ -3,13 +3,14 @@
 //
 
 #pragma once
+
+#include <tbb/parallel_for.h>
 #include "sprites/hittable_list.hpp"
 #include "sprites/sphere.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"
 #include "core/camera.hpp"
-#include "tbb/parallel_for.h"
 #include "common/utils.hpp"
 
 class Tracer {
@@ -93,6 +94,8 @@ void Tracer::Render() {
     auto time_start = std::chrono::high_resolution_clock::now();
 
     int samples = 100;
+    std::atomic<size_t> counter;
+    cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 10000), [&](tbb::blocked_range<int>& r) {
         for(int index = r.begin(); index != r.end(); ++index) {
             int i = index / width;
@@ -108,10 +111,12 @@ void Tracer::Render() {
             color.w = 1.0f;
             color = glm::vec4(sqrt(color.x), sqrt(color.y), sqrt(color.z), color.w);  //gamma校正
             DrawPixel(i, j, color);
+            utils::ShowProgressRate((float)(++counter) / (float)(height * width));
         }
     });
+    cout << endl;
 
-    auto save_dir = fs::current_path().parent_path() / "result.png";
+    auto save_dir = fs::current_path().parent_path() / "ray_tracing.png";
     stbi_flip_vertically_on_write(true);
     stbi_write_png(save_dir.c_str(), width, height, channel, image, width * channel);
 

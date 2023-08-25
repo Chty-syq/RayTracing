@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/ray_tracing/material.hpp"
+#include "material/material.hpp"
 #include "common/utils.hpp"
 
 class Metal: public Material { //镜面反射材质

@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "framework/ray_tracing/hittable.hpp"
+#include "sprites/hittable.hpp"
 
 class Material {
 public:

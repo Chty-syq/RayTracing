@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/ray_tracing/material.hpp"
+#include "material/material.hpp"
 #include "common/utils.hpp"
 
 class Lambertian: public Material { //理想散射材质

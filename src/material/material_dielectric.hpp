@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/ray_tracing/material.hpp"
+#include "material/material.hpp"
 
 class Dielectric: public Material { //透明折射材质
 private:

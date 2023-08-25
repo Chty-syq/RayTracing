@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/ray_tracing/hittable.hpp"
+#include "sprites/hittable.hpp"
 
 class Sphere: public Hittable {
 public:

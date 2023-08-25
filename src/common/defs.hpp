@@ -29,16 +29,10 @@ using std::pair;
 using std::unique_ptr;
 using std::shared_ptr;
 
-using VertexArr = std::vector<Vertex>;
-using IndiceArr = std::vector<GLuint>;
-
 const float PI = (float)acos(-1);
 
 const GLuint SCREEN_WIDTH = 800;
 const GLuint SCREEN_HEIGHT = 600;
-
-const GLuint SHADOW_WIDTH = 1024;
-const GLuint SHADOW_HEIGHT = 1024;
 
 const float CAMERA_PITCH = 0.0;
 const float CAMERA_YAW = -90.0;
@@ -47,13 +41,6 @@ const float CAMERA_SENSITIVITY = 0.1;
 const float CAMERA_FOV = 45.0;
 const float CAMERA_FOCUS = 10.0f;
 
-const GLuint PARTICLE_NUM = 18000;
-
-
 enum Direction {
     forward, backward, left, right, up, down
-};
-
-enum OperateMode {
-    roaming, control
 };

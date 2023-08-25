@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <common/defs.hpp>
-#include "framework/ray_tracing/ray.hpp"
+#include "core/ray.hpp"
 
 class Camera {
 private:

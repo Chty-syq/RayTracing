@@ -15,7 +15,7 @@ public:
     void AddHittable(const shared_ptr<Hittable>& hittable);
     void Clear();
 
-    virtual bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const;
+    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const override;
 };
 
 void HittableList::AddHittable(const shared_ptr<Hittable>& hittable) {

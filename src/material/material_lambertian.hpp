@@ -12,10 +12,10 @@ private:
     glm::vec3 albedo;
 
 public:
-    Lambertian(glm::vec3 albedo): albedo(albedo) {}
-    virtual ~Lambertian() = default;
+    explicit Lambertian(glm::vec3 albedo): albedo(albedo) {}
+    ~Lambertian() override = default;
 
-    virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const;
+    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
 };
 
 bool Lambertian::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {

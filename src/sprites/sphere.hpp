@@ -12,10 +12,10 @@ public:
     glm::vec3 center;
     shared_ptr<Material> material;
 
-    Sphere(glm::vec3 center, float radius, shared_ptr<Material> material): center(center), radius(radius), material(material) {}
-    ~Sphere() {}
+    Sphere(glm::vec3 center, float radius, const shared_ptr<Material>& material): center(center), radius(radius), material(material) {}
+    ~Sphere() override = default;
 
-    virtual bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const;
+    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const override;
 };
 
 bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const {

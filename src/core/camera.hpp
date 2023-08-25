@@ -22,8 +22,8 @@ public:
     glm::vec3 camera_up{};
     glm::vec3 camera_right{};
     glm::vec3 world_up{};
-    float pitch;
-    float yaw;
+    float pitch{};
+    float yaw{};
     float fov;      //视锥大小
     float aspect;   //屏幕宽高比
     float focus;    //焦距

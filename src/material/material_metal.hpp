@@ -14,9 +14,9 @@ private:
 
 public:
     Metal(glm::vec3 albedo, float fuzz): albedo(albedo), fuzz(std::min(fuzz, 1.0f)) {}
-    virtual ~Metal() = default;
+    ~Metal() override = default;
 
-    virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const;
+    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
 };
 
 bool Metal::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {

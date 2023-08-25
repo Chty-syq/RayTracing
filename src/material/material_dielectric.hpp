@@ -11,11 +11,11 @@ private:
     float refract_idx;  //折射率
 
 public:
-    Dielectric(float refract_idx): refract_idx(refract_idx) {}
-    virtual ~Dielectric() = default;
+    explicit Dielectric(float refract_idx): refract_idx(refract_idx) {}
+    ~Dielectric() override = default;
 
     float schlick(float cosine) const;
-    virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const;
+    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
 };
 
 float Dielectric::schlick(float cosine) const { //菲涅尔现象

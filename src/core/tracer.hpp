@@ -10,6 +10,7 @@
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"
+#include "texture/texture_image.hpp"
 #include "core/camera.hpp"
 #include "common/utils.hpp"
 
@@ -96,7 +97,7 @@ void Tracer::Render() {
     int samples = 100;
     std::atomic<size_t> counter;
     cout << "Ray-tracing is running" << endl;
-    tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 10000), [&](tbb::blocked_range<int>& r) {
+    tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
         for(int index = r.begin(); index != r.end(); ++index) {
             int i = index / width;
             int j = index % width;

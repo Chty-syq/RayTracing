@@ -1,7 +1,5 @@
 # Ray-tracing
 
----
-
 ## 1. Description
 
 This project implement an easy ray tracer running on cpu, which is built with following third parties.
@@ -20,7 +18,7 @@ This project refers to the following articles and the code is only used for lear
 
 The code is based on C++17 standard, requiring at least cmake 3.25 version.
 
-Use the following command to pull dependence from github. 
+Use the following command to pull dependence from their repositories. 
 
 ``` bash
 git submodule init
@@ -29,6 +27,6 @@ git submodule update
 
 ## 3. Result
 
-We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 270s.
+We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 240s.
 
 ![](ray_tracing.png)

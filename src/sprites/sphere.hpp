@@ -15,10 +15,10 @@ public:
     Sphere(glm::vec3 center, float radius, const shared_ptr<Material>& material): center(center), radius(radius), material(material) {}
     ~Sphere() override = default;
 
-    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const override;
+    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
 };
 
-bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const {
+bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
     glm::vec3 oc = ray.origin - center;
     float a = glm::dot(ray.direction, ray.direction);
     float b = glm::dot(ray.direction, oc) * 2.0f;
@@ -28,7 +28,7 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) co
         float t1 = (-b - sqrt(discriminant)) / (2.0f * a);
         float t2 = (-b + sqrt(discriminant)) / (2.0f * a);
         if (t1 >= t_min && t1 <= t_max) {
-            result = {
+            hit = {
                     .t = t1,
                     .position = ray.PointAt(t1),
                     .normal = (ray.PointAt(t1) - center) / radius,
@@ -37,7 +37,7 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) co
             return true;
         }
         if (t2 >= t_min && t2 <= t_max) {
-            result = {
+            hit = {
                     .t = t2,
                     .position = ray.PointAt(t2),
                     .normal = (ray.PointAt(t2) - center) / radius,

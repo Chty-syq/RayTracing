@@ -33,6 +33,10 @@ namespace utils {
         return position;
     }
 
+    template<class T> void VectorMerge(vector<T>& v1, vector<T> v2) {
+        v1.insert(v1.end(), v2.begin(), v2.end());
+    }
+
     void ShowProgressRate(float rate) {
         static std::mutex mtx;
         std::lock_guard<std::mutex> lock(mtx);

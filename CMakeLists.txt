@@ -4,12 +4,14 @@ project(RayTracing)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(third-party/tbb)
+add_subdirectory(third-party/assimp)
 
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_executable(${PROJECT_NAME} ${source_files})
 
 target_link_libraries(${PROJECT_NAME}
         tbb
+        assimp
         )
 target_include_directories(${PROJECT_NAME} PUBLIC  # header-only package
         src

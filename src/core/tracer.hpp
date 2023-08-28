@@ -7,6 +7,7 @@
 #include <tbb/parallel_for.h>
 #include "sprites/hittable_list.hpp"
 #include "sprites/sphere.hpp"
+#include "sprites/mesh.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"
@@ -84,6 +85,10 @@ auto Tracer::RandomScene() {
             1.0f,
             std::make_shared<Dielectric>(1.5f)
     ));
+    hittable_list->AddHittable(std::make_shared<Mesh>(
+            fs::current_path().parent_path() / "assets" / "objects" / "cbox_smallbox.obj",
+            std::make_shared<Lambertian>(glm::vec3(0.4f, 0.2f, 0.1f))
+            ));
     return hittable_list;
 }
 
@@ -95,7 +100,7 @@ void Tracer::Render() {
     auto time_start = std::chrono::high_resolution_clock::now();
 
     int samples = 100;
-    std::atomic<size_t> counter;
+    std::atomic<size_t> counter = 0;
     cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
         for(int index = r.begin(); index != r.end(); ++index) {

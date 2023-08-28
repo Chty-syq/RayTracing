@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <stb_image.h>
 #include <stb_image_write.h>
+#include "common/structs.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -28,6 +29,9 @@ using std::vector;
 using std::pair;
 using std::unique_ptr;
 using std::shared_ptr;
+
+using VertexArr = std::vector<Vertex>;
+using IndiceArr = std::vector<GLuint>;
 
 const float PI = (float)acos(-1);
 

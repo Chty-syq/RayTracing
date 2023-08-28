@@ -15,7 +15,7 @@ public:
     void AddHittable(const shared_ptr<Hittable>& hittable);
     void Clear();
 
-    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const override;
+    bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
 };
 
 void HittableList::AddHittable(const shared_ptr<Hittable>& hittable) {
@@ -26,14 +26,14 @@ void HittableList::Clear() {
     list.clear();
 }
 
-bool HittableList::Hit(const Ray &ray, float t_min, float t_max, HitRecord &result) const {
+bool HittableList::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
     bool hit_any = false;
     float t_smallest = 1e9;
     for(const auto& hittable: list) {
         HitRecord temp;
         if (hittable->Hit(ray, t_min, t_max, temp) && temp.t < t_smallest) {
             t_smallest = temp.t;
-            result = temp;
+            hit = temp;
             hit_any = true;
         }
     }

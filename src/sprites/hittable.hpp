@@ -4,6 +4,7 @@
 
 #pragma once
 #include "core/ray.hpp"
+#include "sprites/aabb_box.hpp"
 
 struct Material;
 
@@ -16,7 +17,9 @@ struct HitRecord {
 
 class Hittable {
 public:
+    shared_ptr<AABBBox> box;
     Hittable() = default;
     virtual ~Hittable() = default;
     virtual bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const = 0;
+    virtual void GetAABBBox() = 0;
 };

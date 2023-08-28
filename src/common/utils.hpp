@@ -37,6 +37,14 @@ namespace utils {
         v1.insert(v1.end(), v2.begin(), v2.end());
     }
 
+    glm::vec3 EleWiseMin(glm::vec3 v1, glm::vec3 v2) {
+        return glm::vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
+    }
+
+    glm::vec3 EleWiseMax(glm::vec3 v1, glm::vec3 v2) {
+        return glm::vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
+    };
+
     void ShowProgressRate(float rate) {
         static std::mutex mtx;
         std::lock_guard<std::mutex> lock(mtx);

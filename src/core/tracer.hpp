@@ -94,6 +94,7 @@ auto Tracer::RandomScene() {
 
 void Tracer::Render() {
     auto world = RandomScene();
+    world->BuildBVH();
     auto camera_pos = glm::vec3(3.0f, 4.0f, 10.0f);
     Camera camera(camera_pos, glm::vec3(0.0f));
 

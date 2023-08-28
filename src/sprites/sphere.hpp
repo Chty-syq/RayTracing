@@ -16,6 +16,7 @@ public:
     ~Sphere() override = default;
 
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
+    void GetAABBBox() override;
 };
 
 bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
@@ -47,4 +48,8 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const
         }
     }
     return false;
+}
+
+void Sphere::GetAABBBox() {
+    this->box = std::make_shared<AABBBox>(center - glm::vec3(radius), center + glm::vec3(radius));
 }

@@ -14,18 +14,23 @@
 
 class Mesh: public Hittable {
 private:
+    vector<int> ranks; //排序用
     void ProcessNode(aiNode *node, const aiScene *scene);
     void ProcessMesh(aiMesh *mesh, const aiScene *scene);
+
 public:
     shared_ptr<Material> material;
     VertexArr vertices;
     IndiceArr indices;
+    int num_vertices{};
+    int num_faces{};
 
     Mesh(const std::string& path, const shared_ptr<Material>& material);
     ~Mesh() override = default;
 
     bool HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit, Vertex p0, Vertex p1, Vertex p2, glm::vec3 normal) const;
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
+    void GetAABBBox() override;
 };
 
 Mesh::Mesh(const std::string &path, const shared_ptr<Material> &material): material(material) {
@@ -36,6 +41,20 @@ Mesh::Mesh(const std::string &path, const shared_ptr<Material> &material): mater
     }
     //this->directory = path.substr(0, path.find_last_of('/'));
     this->ProcessNode(scene->mRootNode, scene);
+//    this->num_vertices = (int)vertices.size();
+//    this->num_faces = (int)indices.size() / 3;
+//    for (int i = 0; i < num_faces; ++i)  ranks.push_back(i);
+//    auto face_center = [&](int index) {
+//        auto p0 = vertices[indices[index * 3 + 0]];
+//        auto p1 = vertices[indices[index * 3 + 1]];
+//        auto p2 = vertices[indices[index * 3 + 2]];
+//        return (p0.position + p1.position + p2.position) / 3.0f;
+//    };
+//    std::sort(ranks.begin(), ranks.end(), [&](const int r1, const int r2) {
+//        auto c0 = face_center(ranks[r1]);
+//        auto c1 = face_center(ranks[r2]);
+//        return c0.x < c1.x;
+//    });
     importer.FreeScene();
 }
 
@@ -122,4 +141,14 @@ bool Mesh::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
         }
     }
     return hit_any;
+}
+
+void Mesh::GetAABBBox() {
+    auto box_left = glm::vec3(1e9);
+    auto box_right = glm::vec3(0.0f);
+    for(const auto &vertex: vertices) {
+        box_left = utils::EleWiseMin(box_left, vertex.position);
+        box_right = utils::EleWiseMax(box_right, vertex.position);
+    }
+    this->box = std::make_shared<AABBBox>(box_left, box_right);
 }

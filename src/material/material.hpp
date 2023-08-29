@@ -10,5 +10,6 @@ public:
     Material() = default;
     virtual ~Material() = default;
 
-    virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const = 0;
+    virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const { return false; }
+    virtual glm::vec3 Emitted(const Ray &in, const HitRecord &hit) const { return glm::vec3(0.0f); }
 };

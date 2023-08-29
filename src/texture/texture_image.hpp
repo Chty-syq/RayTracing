@@ -14,7 +14,7 @@ public:
     explicit TextureImage(const std::string &path);
     ~TextureImage() override = default;
 
-    glm::vec3 Sample(float u, float v, glm::vec3 p) const override;
+    glm::vec3 Sample(float u, float v) const override;
 };
 
 TextureImage::TextureImage(const std::string &path) {
@@ -24,7 +24,7 @@ TextureImage::TextureImage(const std::string &path) {
     }
 }
 
-glm::vec3 TextureImage::Sample(float u, float v, glm::vec3 p) const {
+glm::vec3 TextureImage::Sample(float u, float v) const {
     int row = (int)(u * (float)width);
     int col = (int)(v * (float)height);
     row = std::min(std::max(row, 0), width - 1);

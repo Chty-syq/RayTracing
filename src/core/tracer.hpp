@@ -11,7 +11,9 @@
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"
+#include "material/diffuse_light.hpp"
 #include "texture/texture_image.hpp"
+#include "texture/texture_color.hpp"
 #include "core/camera.hpp"
 #include "common/utils.hpp"
 
@@ -73,7 +75,7 @@ auto Tracer::RandomScene() {
     hittable_list->AddHittable(std::make_shared<Sphere>(
             glm::vec3(-4.0f, 1.0f, 0.0f),
             1.0f,
-            std::make_shared<Lambertian>(glm::vec3(0.4f, 0.2f, 0.1f))
+            std::make_shared<DiffuseLight>(std::make_shared<TextureColor>(glm::vec3(0.4f, 0.2f, 0.1f)))
     ));
     hittable_list->AddHittable(std::make_shared<Sphere>(
             glm::vec3(4.0f, 1.0f, 0.0f),
@@ -137,10 +139,11 @@ glm::vec4 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world,
     if (world->Hit(ray, 0.001f, 100.0f, hit)) {
         glm::vec3 attenuation;
         Ray scattered{};
+        auto emitted = hit.material->Emitted(ray, hit);
         if (depth < depth_limit && hit.material->Scatter(ray, hit, attenuation, scattered)) {
-            return glm::vec4(attenuation, 1.0f) * Tracing(scattered, world, depth + 1);
+            return glm::vec4(emitted, 1.0f) + glm::vec4(attenuation, 1.0f) * Tracing(scattered, world, depth + 1);
         }
-        else return {0.0f, 0.0f, 0.0f, 1.0f};
+        else return glm::vec4(emitted, 1.0f);
     }
     else {
         float t = 0.5f * (ray.direction.y + 1.0f);

@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include "common/defs.hpp"
+
 class Texture {
 public:
     Texture() = default;
     virtual ~Texture() = default;
-    virtual glm::vec3 Sample(float u, float v, glm::vec3 p) const = 0;
+    virtual glm::vec3 Sample(float u, float v) const = 0;
 };

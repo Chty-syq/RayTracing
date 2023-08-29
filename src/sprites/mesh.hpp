@@ -118,6 +118,7 @@ bool Mesh::HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit,
             .t = t,
             .position = ray.PointAt(t),
             .normal = p0.normal * w0 + p1.normal * w1 + p2.normal * w2,
+            .tex_coord = p0.tex_coord * w0 + p1.tex_coord * w1 + p2.tex_coord * w2,
             .material = material
     };
     if (glm::dot(hit.normal, ray.direction) > 0.0f)

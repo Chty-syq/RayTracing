@@ -17,6 +17,9 @@ public:
 
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
     void GetAABBBox() override;
+
+private:
+    glm::vec2 GetSphereUV(glm::vec3 position) const; //球上一点的纹理坐标
 };
 
 bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
@@ -33,6 +36,7 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const
                     .t = t1,
                     .position = ray.PointAt(t1),
                     .normal = (ray.PointAt(t1) - center) / radius,
+                    .tex_coord = this->GetSphereUV(ray.PointAt(t1)),
                     .material = material
             };
             return true;
@@ -42,6 +46,7 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const
                     .t = t2,
                     .position = ray.PointAt(t2),
                     .normal = (ray.PointAt(t2) - center) / radius,
+                    .tex_coord = this->GetSphereUV(ray.PointAt(t2)),
                     .material = material
             };
             return true;
@@ -52,4 +57,14 @@ bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const
 
 void Sphere::GetAABBBox() {
     this->box = std::make_shared<AABBBox>(center - glm::vec3(radius), center + glm::vec3(radius));
+}
+
+glm::vec2 Sphere::GetSphereUV(glm::vec3 position) const {
+    auto direction = glm::normalize(position - center);
+    float phi = atan2(direction.z, direction.x);
+    float theta = asin(direction.y);
+    return {
+        0.5f - (phi / (2 * PI)),
+        0.5f + (theta / PI)
+    };
 }

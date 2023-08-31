@@ -16,10 +16,16 @@ public:
     ~Lambertian() override = default;
 
     bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
+    float ScatterPDF(const Ray &in, const HitRecord &hit, const Ray &scattered) const override;
 };
 
 bool Lambertian::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {
     scattered = Ray(hit.position, hit.normal + utils::RandomForUnitSphere());
     attenuation = albedo;
     return true;
+}
+
+float Lambertian::ScatterPDF(const Ray &in, const HitRecord &hit, const Ray &scattered) const {
+    float cosine = glm::dot(glm::normalize(scattered.direction), hit.normal);
+    return std::max(cosine / PI, 0.0f);
 }

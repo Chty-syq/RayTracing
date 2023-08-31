@@ -14,7 +14,14 @@
 #include "material/diffuse_light.hpp"
 #include "texture/texture_image.hpp"
 #include "texture/texture_color.hpp"
+#include "pdfs/pdf_cosine.hpp"
+#include "pdfs/pdf_hittable.hpp"
+#include "pdfs/pdf_mixture.hpp"
+#include "lights/light_quad.hpp"
+#include "lights/light_sphere.hpp"
+#include "core/ortho_bases.hpp"
 #include "core/camera.hpp"
+#include "core/scenes.hpp"
 #include "common/utils.hpp"
 
 class Tracer {
@@ -25,8 +32,7 @@ public:
     unsigned char* image;
     Tracer();
     ~Tracer() = default;
-    static auto RandomScene();
-    glm::vec4 Tracing(const Ray& ray, const shared_ptr<HittableList>& world, int depth);
+    glm::vec3 Tracing(const Ray& ray, const shared_ptr<HittableList>& world, int depth);
     void DrawPixel(int row, int col, glm::vec4 color) const;
     void Render();
 };
@@ -39,70 +45,14 @@ Tracer::Tracer() {
     this->image = new unsigned char[width * height * channel];
 }
 
-auto Tracer::RandomScene() {
-    auto hittable_list = std::make_shared<HittableList>();
-    for(int i = -11; i < 11; ++i) {
-        for(int j = -11; j < 11; ++j) {
-            auto center = glm::vec3((float)i + 0.9f * utils::RandomFloat(0, 1), 0.2f, (float)j + 0.9 * utils::RandomFloat(0, 1));
-            if (glm::length(center - glm::vec3(4.0f, 0.2f, 0.0f)) > 0.9f) {
-                float choose_mat = utils::RandomFloat(0, 1);
-                if (choose_mat < 0.4f) {
-                    hittable_list->AddHittable(std::make_shared<Sphere>(center, 0.2f, std::make_shared<Lambertian>(glm::vec3(
-                            utils::RandomFloat(0, 1) * utils::RandomFloat(0, 1),
-                            utils::RandomFloat(0, 1) * utils::RandomFloat(0, 1),
-                            utils::RandomFloat(0, 1) * utils::RandomFloat(0, 1)
-                            ))));
-                }
-                else if (choose_mat < 0.6f) {
-                    hittable_list->AddHittable(std::make_shared<Sphere>(center, 0.2f, std::make_shared<Metal>(glm::vec3(
-                            0.5f * (1.0f + utils::RandomFloat(0, 1)),
-                            0.5f * (1.0f + utils::RandomFloat(0, 1)),
-                            0.5f * (1.0f + utils::RandomFloat(0, 1))),
-                            0.5f * utils::RandomFloat(0, 1))
-                            ));
-                }
-                else {
-                    hittable_list->AddHittable(std::make_shared<Sphere>(center, 0.2f, std::make_shared<Dielectric>(1.5f)));
-                }
-            }
-        }
-    }
-    hittable_list->AddHittable(std::make_shared<Sphere>( //地面
-            glm::vec3(0.0f, -1000.0f, 0.0f),
-            1000.0f,
-            std::make_shared<Lambertian>(glm::vec3(0.5f))
-    ));
-    hittable_list->AddHittable(std::make_shared<Sphere>(
-            glm::vec3(-4.0f, 1.0f, 0.0f),
-            1.0f,
-            std::make_shared<DiffuseLight>(std::make_shared<TextureColor>(glm::vec3(0.4f, 0.2f, 0.1f)))
-    ));
-    hittable_list->AddHittable(std::make_shared<Sphere>(
-            glm::vec3(4.0f, 1.0f, 0.0f),
-            1.0f,
-            std::make_shared<Metal>(glm::vec3(0.7f, 0.6f, 0.5f), 0.0f)
-    ));
-    hittable_list->AddHittable(std::make_shared<Sphere>(
-            glm::vec3(0.0f, 1.0f, 0.0f),
-            1.0f,
-            std::make_shared<Dielectric>(1.5f)
-    ));
-    hittable_list->AddHittable(std::make_shared<Mesh>(
-            fs::current_path().parent_path() / "assets" / "objects" / "cbox_smallbox.obj",
-            std::make_shared<Lambertian>(glm::vec3(0.4f, 0.2f, 0.1f))
-            ));
-    return hittable_list;
-}
-
 void Tracer::Render() {
-    auto world = RandomScene();
-    world->BuildBVH();
-    auto camera_pos = glm::vec3(3.0f, 4.0f, 10.0f);
-    Camera camera(camera_pos, glm::vec3(0.0f));
+    Camera camera;
+    auto world = Scenes::UseScene1(camera);
 
+    world->BuildBVH();
     auto time_start = std::chrono::high_resolution_clock::now();
 
-    int samples = 100;
+    int samples = 1000;
     std::atomic<size_t> counter = 0;
     cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
@@ -114,7 +64,7 @@ void Tracer::Render() {
                 float u = ((float)j + utils::RandomFloat(0, 1)) / (float)width;
                 float v = ((float)i + utils::RandomFloat(0, 1)) / (float)height;
                 Ray ray = camera.GetRay(u, v);
-                color += Tracing(ray, world, 0);
+                color += glm::vec4(Tracing(ray, world, 0), 1.0f);
             }
             color /= (float)samples;
             color.w = 1.0f;
@@ -134,21 +84,36 @@ void Tracer::Render() {
     cout << "Time cost: " << duration.count() << "s" << endl;
 }
 
-glm::vec4 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world, int depth) {
+glm::vec3 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world, int depth) {
     HitRecord hit;
-    if (world->Hit(ray, 0.001f, 100.0f, hit)) {
+    if (world->Hit(ray, T_MIN, T_MAX, hit)) {
         glm::vec3 attenuation;
         Ray scattered{};
         auto emitted = hit.material->Emitted(ray, hit);
         if (depth < depth_limit && hit.material->Scatter(ray, hit, attenuation, scattered)) {
-            return glm::vec4(emitted, 1.0f) + glm::vec4(attenuation, 1.0f) * Tracing(scattered, world, depth + 1);
+            if (dynamic_cast<Lambertian*>(hit.material.get()) != nullptr) {
+                auto p0 = std::make_shared<PDFCosine>(hit.normal);
+                auto p1 = std::make_shared<PDFHittable>(Scenes::light_quad, hit.position);
+                auto p2 = std::make_shared<PDFHittable>(Scenes::light_sphere, hit.position);
+                PDFMixture pdf(p0, p2, 0.5f);
+                //PDFHittable pdf(Scenes::light_sphere, hit.position);
+                //PDFCosine pdf(hit.normal);
+                auto direction = pdf.Sample();
+                auto prob = pdf.Value(direction);
+                scattered = Ray(hit.position, direction);
+                float scattering_pdf = hit.material->ScatterPDF(ray, hit, scattered);
+                //utils::PrintVec3(glm::vec3(scattering_pdf, prob, 0.0f));
+                return emitted + attenuation * scattering_pdf * Tracing(scattered, world, depth + 1) / prob;
+            }
+            return emitted + attenuation * Tracing(scattered, world, depth + 1);
         }
-        else return glm::vec4(emitted, 1.0f);
+        else return emitted;
     }
     else {
-        float t = 0.5f * (ray.direction.y + 1.0f);
-        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
-        return {color, 1.0f};
+//        float t = 0.5f * (ray.direction.y + 1.0f);
+//        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
+//        return color;
+        return glm::vec3(0.0f);
     }
 }
 

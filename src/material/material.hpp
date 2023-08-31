@@ -12,4 +12,5 @@ public:
 
     virtual bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const { return false; }
     virtual glm::vec3 Emitted(const Ray &in, const HitRecord &hit) const { return glm::vec3(0.0f); }
+    virtual float ScatterPDF(const Ray &in, const HitRecord &hit, const Ray &scattered) const { return 0.0f; }
 };

@@ -9,6 +9,7 @@
 #include <assimp/postprocess.h>
 #include <queue>
 #include "sprites/hittable.hpp"
+#include "core/transformation.hpp"
 #include "common/structs.hpp"
 #include "common/utils.hpp"
 
@@ -24,8 +25,9 @@ public:
     IndiceArr indices;
     int num_vertices{};
     int num_faces{};
+    Transformation transformation;
 
-    Mesh(const std::string& path, const shared_ptr<Material>& material);
+    Mesh(const std::string& path, const shared_ptr<Material>& material, Transformation transformation);
     ~Mesh() override = default;
 
     bool HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit, Vertex p0, Vertex p1, Vertex p2, glm::vec3 normal) const;
@@ -33,7 +35,7 @@ public:
     void GetAABBBox() override;
 };
 
-Mesh::Mesh(const std::string &path, const shared_ptr<Material> &material): material(material) {
+Mesh::Mesh(const std::string &path, const shared_ptr<Material> &material, Transformation transformation): material(material), transformation(transformation) {
     Assimp::Importer importer;
     auto scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_FixInfacingNormals | aiProcess_OptimizeMeshes);
     if (!scene || !scene->mRootNode || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
@@ -72,11 +74,13 @@ void Mesh::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
         auto position = mesh->mVertices[i];
         auto normal = mesh->mNormals[i];
         auto tex_coord = mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i] : aiVector3D(0.0f);
-        m_vertices.emplace_back(
-                glm::vec3(position.x / 100.0f, position.y / 100.0f, position.z / 100.0f),
+        Vertex vertex(
+                glm::vec3(position.x, position.y, position.z),
                 glm::vec2(tex_coord.x, tex_coord.y),
-                glm::vec3(normal.x, normal.y, normal.z)
+                glm::normalize(glm::vec3(normal.x, normal.y, normal.z))
         );
+        transformation.Apply(vertex);
+        m_vertices.emplace_back(vertex);
     }
     for(int i = 0; i < mesh->mNumFaces; ++i) {
         auto face = mesh->mFaces[i];
@@ -117,7 +121,7 @@ bool Mesh::HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit,
     hit = {
             .t = t,
             .position = ray.PointAt(t),
-            .normal = p0.normal * w0 + p1.normal * w1 + p2.normal * w2,
+            .normal = glm::normalize(p0.normal * w0 + p1.normal * w1 + p2.normal * w2),
             .tex_coord = p0.tex_coord * w0 + p1.tex_coord * w1 + p2.tex_coord * w2,
             .material = material
     };

@@ -38,11 +38,14 @@ const float PI = (float)acos(-1);
 const GLuint SCREEN_WIDTH = 800;
 const GLuint SCREEN_HEIGHT = 600;
 
+const float T_MIN = 0.001f;
+const float T_MAX = 100.0f;
+
 const float CAMERA_PITCH = 0.0;
 const float CAMERA_YAW = -90.0;
 const float CAMERA_SPEED = 3.0;
 const float CAMERA_SENSITIVITY = 0.1;
-const float CAMERA_FOV = 45.0;
+const float CAMERA_FOV = 39.0;
 const float CAMERA_FOCUS = 10.0f;
 
 enum Direction {

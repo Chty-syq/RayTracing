@@ -45,6 +45,12 @@ namespace utils {
         return { std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z) };
     };
 
+    void PrintVec3(glm::vec3 v) {
+        static std::mutex mtx;
+        std::lock_guard<std::mutex> lock(mtx);
+        cout << endl << v.x << " " << v.y << " " << v.z << endl;
+    }
+
     void ShowProgressRate(float rate) {
         static std::mutex mtx;
         std::lock_guard<std::mutex> lock(mtx);

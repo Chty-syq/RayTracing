@@ -27,6 +27,7 @@ public:
     float fov;      //视锥大小
     float aspect;   //屏幕宽高比
     float focus;    //焦距
+    Camera() = default;
     explicit Camera(glm::vec3 camera_pos);
     Camera(glm::vec3 camera_pos, glm::vec3 target);
     glm::mat4 GetViewMat() const;

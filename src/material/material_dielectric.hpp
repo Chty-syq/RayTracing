@@ -15,7 +15,7 @@ public:
     ~Dielectric() override = default;
 
     float schlick(float cosine) const;
-    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
+    bool Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const override;
 };
 
 float Dielectric::schlick(float cosine) const { //菲涅尔现象
@@ -23,23 +23,27 @@ float Dielectric::schlick(float cosine) const { //菲涅尔现象
     return f0 + (1.0f - f0) * pow(1.0f - cosine, 5.0f);
 }
 
-bool Dielectric::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {
+bool Dielectric::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
     auto ray_reflected = glm::reflect(in.direction, hit.normal); //反射光
     auto ray_refracted = glm::dot(in.direction, hit.normal) > 0.0f ? //光线由物体内部射向外部
             glm::refract(in.direction, -hit.normal, refract_idx) :
             glm::refract(in.direction, hit.normal, 1.0f / refract_idx);
 
+    glm::vec3 direction;
     if (glm::length(ray_refracted) > 0.0f) {
         float cosine = abs(glm::dot(in.direction, hit.normal));
         float probs = schlick(cosine);
-        scattered = utils::RandomFloat(0, 1) < probs ?
-                Ray(hit.position, ray_reflected) :
-                Ray(hit.position, ray_refracted);
+        direction = utils::RandomFloat(0, 1) < probs ? ray_reflected : ray_refracted;
     }
     else { //全反射
-        scattered = Ray(hit.position, ray_reflected);
+        direction = ray_reflected;
     }
-    attenuation = glm::vec3(1.0f);
+    scatter = {
+            .ray = Ray(hit.position, direction),
+            .attenuation = glm::vec3(1.0f),
+            .is_sample = false,
+            .pdf = nullptr
+    };
     return true;
 }
 

@@ -15,7 +15,7 @@ public:
 
 OrthoBases::OrthoBases(glm::vec3 normal) {
     this->basis[2] = glm::normalize(normal);
-    auto world_up = (normal.x > 0.9f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
+    auto world_up = (fabs(this->basis[2].x) > 0.9f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
     this->basis[1] = glm::normalize(glm::cross(this->basis[2], world_up));
     this->basis[0] = glm::normalize(glm::cross(this->basis[2], this->basis[1]));
 }

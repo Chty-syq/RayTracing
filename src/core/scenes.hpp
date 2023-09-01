@@ -105,14 +105,14 @@ namespace Scenes {
         ));
         hittable_list->AddHittable(std::make_shared<Mesh>(
                 fs::current_path().parent_path() / "assets" / "objects" / "cbox_largebox.obj",
-                std::make_shared<Metal>(glm::vec3(1.0f), 0.0f),
+                std::make_shared<Lambertian>(glm::vec3(0.73f)),
                 Transformation::FromSize(glm::vec3(0.01f))
         ));
-        hittable_list->AddHittable(std::make_shared<Sphere>( //玻璃球体
-                glm::vec3(1.855f, 2.3f, 1.69f),
-                0.65f,
-                std::make_shared<Dielectric>(1.5f)
-        ));
+//        hittable_list->AddHittable(std::make_shared<Sphere>( //玻璃球体
+//                glm::vec3(1.855f, 2.3f, 1.69f),
+//                0.65f,
+//                std::make_shared<Dielectric>(1.5f)
+//        ));
 //        hittable_list->AddHittable(std::make_shared<Sphere>( //发光球体
 //                glm::vec3(1.855f, 2.3f, 1.69f),
 //                0.65f,
@@ -128,7 +128,7 @@ namespace Scenes {
                 std::make_shared<DiffuseLight>(std::make_shared<TextureColor>(glm::vec3(1.0f))),
                 Transformation(glm::vec3(2.93f, 5.488f, 3.195f), Transformation::DEFAULT_ROTATE, glm::vec3(1.0f))
         );
-        hittable_list->AddHittable(light_quad);
+        //hittable_list->AddHittable(light_quad);
         camera = Camera(glm::vec3(2.78f, 2.73f, -8.0f), glm::vec3(2.78f, 2.73f, -7.99f));
         return hittable_list;
     }

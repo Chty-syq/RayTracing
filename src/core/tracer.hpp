@@ -52,7 +52,7 @@ void Tracer::Render() {
     world->BuildBVH();
     auto time_start = std::chrono::high_resolution_clock::now();
 
-    int samples = 1000;
+    int samples = 100;
     std::atomic<size_t> counter = 0;
     cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
@@ -68,6 +68,9 @@ void Tracer::Render() {
             }
             color /= (float)samples;
             color.w = 1.0f;
+            if (color.r != color.r)  color.r = 0.0f;
+            if (color.g != color.g)  color.g = 0.0f;
+            if (color.b != color.b)  color.b = 0.0f;
             color = glm::vec4(sqrt(color.x), sqrt(color.y), sqrt(color.z), color.w);  //gamma校正
             DrawPixel(i, j, color);
             utils::ShowProgressRate((float)(++counter) / (float)(height * width));
@@ -87,25 +90,28 @@ void Tracer::Render() {
 glm::vec3 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world, int depth) {
     HitRecord hit;
     if (world->Hit(ray, T_MIN, T_MAX, hit)) {
-        glm::vec3 attenuation;
-        Ray scattered{};
         auto emitted = hit.material->Emitted(ray, hit);
-        if (depth < depth_limit && hit.material->Scatter(ray, hit, attenuation, scattered)) {
-            if (dynamic_cast<Lambertian*>(hit.material.get()) != nullptr) {
+        ScatterRecord scatter;
+        if (depth < depth_limit && hit.material->Scatter(ray, hit, scatter)) {
+            if (scatter.is_sample) {  //蒙特卡罗采样
                 auto p0 = std::make_shared<PDFCosine>(hit.normal);
                 auto p1 = std::make_shared<PDFHittable>(Scenes::light_quad, hit.position);
                 auto p2 = std::make_shared<PDFHittable>(Scenes::light_sphere, hit.position);
-                PDFMixture pdf(p0, p2, 0.5f);
-                //PDFHittable pdf(Scenes::light_sphere, hit.position);
+                //PDFMixture pdf(p0, p1, 0.5f);
                 //PDFCosine pdf(hit.normal);
+                //PDFHittable pdf(Scenes::light_quad, hit.position);
+                //PDFHittable pdf(Scenes::light_sphere, hit.position);
+                PDFMixture pdf(scatter.pdf, p2, 0.5f);
                 auto direction = pdf.Sample();
                 auto prob = pdf.Value(direction);
-                scattered = Ray(hit.position, direction);
+                Ray scattered = Ray(hit.position, direction);
                 float scattering_pdf = hit.material->ScatterPDF(ray, hit, scattered);
                 //utils::PrintVec3(glm::vec3(scattering_pdf, prob, 0.0f));
-                return emitted + attenuation * scattering_pdf * Tracing(scattered, world, depth + 1) / prob;
+                return emitted + scatter.attenuation * scattering_pdf * Tracing(scattered, world, depth + 1) / prob;
             }
-            return emitted + attenuation * Tracing(scattered, world, depth + 1);
+            else {
+                return emitted + scatter.attenuation * Tracing(scatter.ray, world, depth + 1);
+            }
         }
         else return emitted;
     }

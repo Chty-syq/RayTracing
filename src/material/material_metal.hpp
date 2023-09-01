@@ -16,11 +16,16 @@ public:
     Metal(glm::vec3 albedo, float fuzz): albedo(albedo), fuzz(std::min(fuzz, 1.0f)) {}
     ~Metal() override = default;
 
-    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
+    bool Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const override;
 };
 
-bool Metal::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {
-    scattered = Ray(hit.position, glm::reflect(in.direction, hit.normal) + utils::RandomForUnitSphere() * fuzz);
-    attenuation = albedo;
-    return (glm::dot(scattered.direction, hit.normal) > 0.0f);
+bool Metal::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
+    scatter = {
+            .ray = Ray(hit.position, glm::reflect(in.direction, hit.normal) + utils::RandomForUnitSphere() * fuzz),
+            .attenuation = albedo,
+            .is_sample = false,
+            .pdf = nullptr
+    };
+    return true;
+    //return (glm::dot(scattered.direction, hit.normal) > 0.0f);
 }

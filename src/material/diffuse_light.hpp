@@ -11,16 +11,13 @@ class DiffuseLight: public Material {
 public:
     shared_ptr<Texture> texture;
     explicit DiffuseLight(const shared_ptr<Texture>& texture): texture(texture) {}
-
-    bool Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
     glm::vec3 Emitted(const Ray &in, const HitRecord &hit) const override;
 };
 
-bool DiffuseLight::Scatter(const Ray &in, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const {
-    return false;
-}
-
 glm::vec3 DiffuseLight::Emitted(const Ray &in, const HitRecord &hit) const {
     auto tex_coord = hit.tex_coord;
-    return texture->Sample(tex_coord.x, tex_coord.y);
+    if (glm::dot(hit.normal, in.direction) < 0.0f)
+        return texture->Sample(tex_coord.x, tex_coord.y);
+    else
+        return glm::vec3(0.0f);
 }

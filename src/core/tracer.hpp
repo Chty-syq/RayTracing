@@ -28,11 +28,15 @@ class Tracer {
 private:
     int depth_limit{};
     int width, height, channel{};
+    Camera camera;
+    shared_ptr<HittableList> world;
+    shared_ptr<HittableList> lights;
+
 public:
     unsigned char* image;
     Tracer();
     ~Tracer() = default;
-    glm::vec3 Tracing(const Ray& ray, const shared_ptr<HittableList>& world, int depth);
+    glm::vec3 Tracing(const Ray& ray, int depth);
     void DrawPixel(int row, int col, glm::vec4 color) const;
     void Render();
 };
@@ -43,16 +47,15 @@ Tracer::Tracer() {
     this->channel = 4;
     this->depth_limit = 50;
     this->image = new unsigned char[width * height * channel];
+
+    Scenes::UseScene1(camera, world, lights);
+    world->BuildBVH();
 }
 
 void Tracer::Render() {
-    Camera camera;
-    auto world = Scenes::UseScene0(camera);
-
-    world->BuildBVH();
     auto time_start = std::chrono::high_resolution_clock::now();
 
-    int samples = 100;
+    int samples = 1000;
     std::atomic<size_t> counter = 0;
     cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
@@ -64,7 +67,7 @@ void Tracer::Render() {
                 float u = ((float)j + utils::RandomFloat(0, 1)) / (float)width;
                 float v = ((float)i + utils::RandomFloat(0, 1)) / (float)height;
                 Ray ray = camera.GetRay(u, v);
-                color += glm::vec4(Tracing(ray, world, 0), 1.0f);
+                color += glm::vec4(Tracing(ray, 0), 1.0f);
             }
             color /= (float)samples;
             color.w = 1.0f;
@@ -76,7 +79,6 @@ void Tracer::Render() {
             utils::ShowProgressRate((float)(++counter) / (float)(height * width));
         }
     });
-    cout << endl;
 
     auto save_dir = fs::current_path().parent_path() / "ray_tracing.png";
     stbi_flip_vertically_on_write(true);
@@ -84,42 +86,35 @@ void Tracer::Render() {
 
     auto time_end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(time_end - time_start);
-    cout << "Time cost: " << duration.count() << "s" << endl;
+    cout << endl << "Time cost: " << duration.count() << "s" << endl;
 }
 
-glm::vec3 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world, int depth) {
+glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
     HitRecord hit;
     if (world->Hit(ray, T_MIN, T_MAX, hit)) {
         auto emitted = hit.material->Emitted(ray, hit);
         ScatterRecord scatter;
         if (depth < depth_limit && hit.material->Scatter(ray, hit, scatter)) {
             if (scatter.is_sample) {  //蒙特卡罗采样
-                auto p0 = std::make_shared<PDFCosine>(hit.normal);
-                auto p1 = std::make_shared<PDFHittable>(Scenes::light_quad, hit.position);
-                auto p2 = std::make_shared<PDFHittable>(Scenes::light_sphere, hit.position);
-                //PDFMixture pdf(p0, p1, 0.5f);
-                PDFCosine pdf(hit.normal);
-                //PDFHittable pdf(Scenes::light_quad, hit.position);
-                //PDFHittable pdf(Scenes::light_sphere, hit.position);
-                //PDFMixture pdf(scatter.pdf, p1, 0.5f);
-                auto direction = pdf.Sample();
-                auto prob = pdf.Value(direction);
+                auto pdf = lights->Empty() ? scatter.pdf :  //没有光源则仅从材质采样
+                        std::make_shared<PDFMixture>(scatter.pdf, std::make_shared<PDFHittable>(lights, hit.position));  //有光源则混合采样
+
+                auto direction = pdf->Sample();
+                auto prob = pdf->Value(direction);
                 Ray scattered = Ray(hit.position, direction);
-                float scattering_pdf = hit.material->ScatterPDF(ray, hit, scattered);
-                //utils::PrintVec3(glm::vec3(scattering_pdf, prob, 0.0f));
-                return emitted + scatter.attenuation * scattering_pdf * Tracing(scattered, world, depth + 1) / prob;
+                return emitted + scatter.attenuation * hit.material->ScatterPDF(ray, hit, scattered) * Tracing(scattered, depth + 1) / prob;
             }
             else {
-                return emitted + scatter.attenuation * Tracing(scatter.ray, world, depth + 1);
+                return emitted + scatter.attenuation * Tracing(scatter.ray, depth + 1);
             }
         }
         else return emitted;
     }
     else {
-        float t = 0.5f * (ray.direction.y + 1.0f);
-        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
-        return color;
-        //return glm::vec3(0.0f);
+//        float t = 0.5f * (ray.direction.y + 1.0f);
+//        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
+//        return color;
+        return glm::vec3(0.0f);
     }
 }
 

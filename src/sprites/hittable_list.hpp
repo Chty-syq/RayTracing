@@ -18,6 +18,7 @@ public:
 
     void BuildBVH();
     void Clear();
+    bool Empty() const;
 
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
     void GetAABBBox() override {};
@@ -26,6 +27,9 @@ private:
     int root = 1;
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit, int node, int l, int r) const;
     void BuildBVH(int node, int left, int right);
+
+    float PDFValue(glm::vec3 origin, glm::vec3 v) const override;
+    glm::vec3 Random(glm::vec3 origin) const override;
 };
 
 void HittableList::AddHittable(const shared_ptr<Hittable>& hittable) {
@@ -60,6 +64,10 @@ void HittableList::Clear() {
     list.clear();
 }
 
+bool HittableList::Empty() const {
+    return list.empty();
+}
+
 bool HittableList::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit, int node, int l, int r) const {
     if (l == r) {
         return list[l]->Hit(ray, t_min, t_max, hit);
@@ -90,4 +98,17 @@ bool HittableList::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit)
 //        }
 //    }
 //    return hit_any;
+}
+
+float HittableList::PDFValue(glm::vec3 origin, glm::vec3 v) const {
+    float sum = 0.0f;
+    for(const auto &hittable: list) {
+        sum += hittable->PDFValue(origin, v);
+    }
+    return sum / (float)list.size();
+}
+
+glm::vec3 HittableList::Random(glm::vec3 origin) const {
+    int index = static_cast<int>(utils::RandomFloat(0, 0.99) * (float)list.size());
+    return list[index]->Random(origin);
 }

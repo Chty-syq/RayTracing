@@ -41,3 +41,11 @@ We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering c
 #### Cornell-box with Sphere Light
 
 ![](results/cornell_box_1.png)
+
+#### Cornell-box with both Quad and Sphere Light
+
+![](results/cornell_box_2.png)
+
+#### Cornell-box with both Lights Sampling 1000 rays
+
+![](results/cornell_box_3.png)

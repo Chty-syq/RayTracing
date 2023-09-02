@@ -7,6 +7,7 @@ This project implement an easy ray tracer running on cpu, which is built with fo
 - [GLM](https://github.com/g-truc/glm) for linear algebra calculation.
 - [stb_image](https://github.com/nothings/stb) for image rendering.
 - [tbb](https://github.com/oneapi-src/oneTBB) for parallel acceleration.
+- [assimp](https://github.com/assimp/assimp) for mesh processing.
 
 This project refers to the following articles and the code is only used for learning. 
 
@@ -27,6 +28,19 @@ git submodule update
 
 ## 3. Result
 
-We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 240s.
+We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 20s with release build.
 
-![](ray_tracing.png)
+<div style="text-align: center;">
+    <img src="results/spheres.png" title="spheres"  alt="spheres"/>
+    <em>spheres with environment light</em>
+</div>
+
+<div style="text-align: center;">
+    <img src="results/cornell_box_0.png" title="cornell_box"  alt="cornell_box"/>
+    <em>cornell box with quad light</em>
+</div>
+
+<div style="text-align: center;">
+    <img src="results/cornell_box_1.png" title="cornell_box"  alt="cornell_box"/>
+    <em>cornell box with sphere light</em>
+</div>

@@ -47,7 +47,7 @@ Tracer::Tracer() {
 
 void Tracer::Render() {
     Camera camera;
-    auto world = Scenes::UseScene1(camera);
+    auto world = Scenes::UseScene0(camera);
 
     world->BuildBVH();
     auto time_start = std::chrono::high_resolution_clock::now();
@@ -98,10 +98,10 @@ glm::vec3 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world,
                 auto p1 = std::make_shared<PDFHittable>(Scenes::light_quad, hit.position);
                 auto p2 = std::make_shared<PDFHittable>(Scenes::light_sphere, hit.position);
                 //PDFMixture pdf(p0, p1, 0.5f);
-                //PDFCosine pdf(hit.normal);
+                PDFCosine pdf(hit.normal);
                 //PDFHittable pdf(Scenes::light_quad, hit.position);
                 //PDFHittable pdf(Scenes::light_sphere, hit.position);
-                PDFMixture pdf(scatter.pdf, p2, 0.5f);
+                //PDFMixture pdf(scatter.pdf, p1, 0.5f);
                 auto direction = pdf.Sample();
                 auto prob = pdf.Value(direction);
                 Ray scattered = Ray(hit.position, direction);
@@ -116,10 +116,10 @@ glm::vec3 Tracer::Tracing(const Ray &ray, const shared_ptr<HittableList>& world,
         else return emitted;
     }
     else {
-//        float t = 0.5f * (ray.direction.y + 1.0f);
-//        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
-//        return color;
-        return glm::vec3(0.0f);
+        float t = 0.5f * (ray.direction.y + 1.0f);
+        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
+        return color;
+        //return glm::vec3(0.0f);
     }
 }
 

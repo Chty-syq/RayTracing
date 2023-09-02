@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
-project(RayTracing)
 
 set(CMAKE_CXX_STANDARD 17)
+
+project(RayTracing LANGUAGES CXX CUDA)
 
 add_subdirectory(third-party/tbb)
 add_subdirectory(third-party/assimp)

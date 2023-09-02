@@ -40,7 +40,7 @@ We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering c
     <em>cornell box with quad light</em>
 </div>
 
-<div style="text-align: center;">
+<center>
     <img src="results/cornell_box_1.png" title="cornell_box"  alt="cornell_box"/>
     <em>cornell box with sphere light</em>
-</div>
+</center>

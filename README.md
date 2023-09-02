@@ -30,17 +30,14 @@ git submodule update
 
 We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 20s with release build.
 
-<div style="text-align: center;">
-    <img src="results/spheres.png" title="spheres"  alt="spheres"/>
-    <em>spheres with environment light</em>
-</div>
+#### Spheres with Environment Light
 
-<div style="text-align: center;">
-    <img src="results/cornell_box_0.png" title="cornell_box"  alt="cornell_box"/>
-    <em>cornell box with quad light</em>
-</div>
+![](results/spheres.png)
 
-<center>
-    <img src="results/cornell_box_1.png" title="cornell_box"  alt="cornell_box"/>
-    <em>cornell box with sphere light</em>
-</center>
+#### Cornell-Box with Quad Light
+
+![](results/cornell_box_0.png)
+
+#### Cornell-box with Sphere Light
+
+![](results/cornell_box_1.png)

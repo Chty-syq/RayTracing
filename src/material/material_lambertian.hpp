@@ -22,7 +22,7 @@ public:
 
 bool Lambertian::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
     scatter = {
-            .ray = Ray(hit.position, hit.normal + utils::RandomForUnitSphere()),
+            .ray = Ray(hit.position, hit.normal + utils::RandomUnitVector()),
             .attenuation = albedo,
             .is_sample = true,
             .pdf = std::make_shared<PDFCosine>(hit.normal)

@@ -103,7 +103,7 @@ namespace Scenes {
         ));
         world->AddHittable(std::make_shared<Mesh>(
                 fs::current_path().parent_path() / "assets" / "objects" / "cbox_largebox.obj",
-                std::make_shared<Lambertian>(glm::vec3(0.73f)),
+                std::make_shared<Isotropic>(glm::vec3(0.73f)),
                 Transformation::FromSize(glm::vec3(0.01f))
         ));
 //        world->AddHittable(std::make_shared<Sphere>( //玻璃球体

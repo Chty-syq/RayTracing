@@ -25,7 +25,7 @@ namespace utils {
         return dist(generator());
     }
 
-    glm::vec3 RandomForUnitSphere() {
+    glm::vec3 RandomUnitVector() {
         glm::vec3 position;
         do {
             position = glm::vec3(RandomFloat(0, 1), RandomFloat(0, 1), RandomFloat(0, 1)) * 2.0f - glm::vec3(1.0f);

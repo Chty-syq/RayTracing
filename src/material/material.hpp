@@ -5,6 +5,7 @@
 #pragma once
 #include "sprites/hittable.hpp"
 #include "pdfs/pdf.hpp"
+#include "common/utils.hpp"
 
 struct ScatterRecord {
     Ray ray;                //散射光线

@@ -3,8 +3,9 @@
 //
 
 #pragma once
-#include "sprites/hittable.hpp"
+#include "hittable/hittable.hpp"
 #include "common/utils.hpp"
+#include "common/random.hpp"
 
 class HittableList: public Hittable {
 public:
@@ -56,7 +57,7 @@ void HittableList::BuildBVH() {
     std::sort(list.begin(), list.end(), [](const shared_ptr<Hittable> &h1, const shared_ptr<Hittable> &h2) {
         return h1->box->GetCenter().x < h2->box->GetCenter().x;
     });
-    bvh_tree.resize((list.size() << 1) + 50);
+    bvh_tree.resize(list.size() << 2);
     BuildBVH(root, 0, (int)list.size() - 1);
 }
 
@@ -109,6 +110,6 @@ float HittableList::PDFValue(glm::vec3 origin, glm::vec3 v) const {
 }
 
 glm::vec3 HittableList::Random(glm::vec3 origin) const {
-    int index = static_cast<int>(utils::RandomFloat(0, 0.99) * (float)list.size());
+    int index = static_cast<int>(MagicRandom::Float(0, 0.99) * (float)list.size());
     return list[index]->Random(origin);
 }

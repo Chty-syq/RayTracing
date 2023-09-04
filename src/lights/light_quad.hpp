@@ -5,7 +5,7 @@
 #pragma once
 #include "pdfs/pdf.hpp"
 
-#define MESH_PATH (fs::current_path().parent_path() / "assets" / "objects" / "quad.obj")
+#define MESH_PATH (fs::current_path().parent_path() / "assets" / "mesh_triangle" / "basic" / "quad.obj")
 
 class LightQuad: public Mesh {
 private:
@@ -19,14 +19,14 @@ public:
     glm::vec3 Random(glm::vec3 origin) const override;
 };
 
-LightQuad::LightQuad(const shared_ptr<Material>& material, Transformation transformation): Mesh(MESH_PATH ,material, transformation) {
+LightQuad::LightQuad(const shared_ptr<Material>& material, Transformation transformation): Mesh(MESH_PATH, material, transformation) {
     this->width = transformation.size[0] * 2.0f;
     this->height = transformation.size[2] * 2.0f;
 }
 
 glm::vec3 LightQuad::Random(glm::vec3 origin) const {
     auto center = transformation.position;
-    auto point = center + glm::vec3(utils::RandomFloat(-0.5, 0.5) * width, 0.0f, utils::RandomFloat(-0.5, 0.5) * height);
+    auto point = center + glm::vec3(MagicRandom::Float(-0.5, 0.5) * width, 0.0f, MagicRandom::Float(-0.5, 0.5) * height);
     return point - origin;
 }
 

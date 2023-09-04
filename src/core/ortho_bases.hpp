@@ -6,7 +6,7 @@
 
 #include "common/defs.hpp"
 
-class OrthoBases {
+class OrthoBases { //正交基
 public:
     glm::vec3 basis[3]{};
     explicit OrthoBases(glm::vec3 normal);

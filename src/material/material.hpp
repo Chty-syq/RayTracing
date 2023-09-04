@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "sprites/hittable.hpp"
+#include "hittable/hittable.hpp"
 #include "pdfs/pdf.hpp"
 #include "common/utils.hpp"
 

@@ -4,7 +4,6 @@
 #pragma once
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <GLFW/glfw3.h>
 #include <cstdio>
 #include <memory>
 #include <iostream>
@@ -31,20 +30,17 @@ using std::unique_ptr;
 using std::shared_ptr;
 
 using VertexArr = std::vector<Vertex>;
-using IndiceArr = std::vector<GLuint>;
+using IndiceArr = std::vector<int>;
 
 const float PI = (float)acos(-1);
 
-const GLuint SCREEN_WIDTH = 800;
-const GLuint SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
 
+const int NUM_SAMPLE_RAYS = 100;
 const float T_MIN = 0.001f;
 const float T_MAX = 100.0f;
 
-const float CAMERA_PITCH = 0.0;
-const float CAMERA_YAW = -90.0;
-const float CAMERA_SPEED = 3.0;
-const float CAMERA_SENSITIVITY = 0.1;
 const float CAMERA_FOV = 39.0;
 const float CAMERA_FOCUS = 10.0f;
 

@@ -23,5 +23,5 @@ float PDFMixture::Value(glm::vec3 direction) const {
 }
 
 glm::vec3 PDFMixture::Sample() const {
-    return (utils::RandomFloat(0, 1) < weight) ? pdfs[0]->Sample() : pdfs[1]->Sample();
+    return (MagicRandom::Float(0, 1) < weight) ? pdfs[0]->Sample() : pdfs[1]->Sample();
 }

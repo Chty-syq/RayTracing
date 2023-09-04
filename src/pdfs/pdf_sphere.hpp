@@ -17,5 +17,5 @@ float PDFSphere::Value(glm::vec3 direction) const {
 }
 
 glm::vec3 PDFSphere::Sample() const {
-    return utils::RandomUnitVector();
+    return MagicRandom::UnitVector();
 }

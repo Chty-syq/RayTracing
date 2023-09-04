@@ -33,7 +33,7 @@ bool Dielectric::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &sca
     if (glm::length(ray_refracted) > 0.0f) {
         float cosine = abs(glm::dot(in.direction, hit.normal));
         float probs = schlick(cosine);
-        direction = utils::RandomFloat(0, 1) < probs ? ray_reflected : ray_refracted;
+        direction = MagicRandom::Float(0, 1) < probs ? ray_reflected : ray_refracted;
     }
     else { //全反射
         direction = ray_reflected;

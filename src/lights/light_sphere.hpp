@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "sprites/sphere.hpp"
+#include "hittable/sphere.hpp"
 #include "pdfs/pdf.hpp"
 
 class LightSphere: public Sphere {
@@ -28,9 +28,9 @@ float LightSphere::PDFValue(glm::vec3 origin, glm::vec3 v) const {
 
 glm::vec3 LightSphere::Random(glm::vec3 origin) const {
     auto oc = this->center - origin;
-    float r1 = utils::RandomFloat(0, 1);
+    float r1 = MagicRandom::Float(0, 1);
     float phi = 2.0f * PI * r1;
-    float r2 = utils::RandomFloat(0, 1);
+    float r2 = MagicRandom::Float(0, 1);
 
     float cos_theta_max = sqrt(1.0f - pow(radius, 2.0f) / glm::dot(oc, oc));
     float cos_theta = 1.0f + r2 * (cos_theta_max - 1.0f);

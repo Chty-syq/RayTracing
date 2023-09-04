@@ -8,7 +8,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <queue>
-#include "sprites/hittable.hpp"
+#include "hittable/hittable.hpp"
 #include "core/transformation.hpp"
 #include "common/structs.hpp"
 #include "common/utils.hpp"

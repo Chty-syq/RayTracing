@@ -5,9 +5,9 @@
 #pragma once
 
 #include <tbb/parallel_for.h>
-#include "sprites/hittable_list.hpp"
-#include "sprites/sphere.hpp"
-#include "sprites/mesh.hpp"
+#include "hittable//hittable_list.hpp"
+#include "hittable/sphere.hpp"
+#include "hittable/mesh.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"
@@ -25,11 +25,13 @@
 #include "core/camera.hpp"
 #include "core/scenes.hpp"
 #include "common/utils.hpp"
+#include "common/random.hpp"
 
 class Tracer {
 private:
     int depth_limit{};
     int width, height, channel{};
+    glm::vec3 bg_color{};
     Camera camera;
     shared_ptr<HittableList> world;
     shared_ptr<HittableList> lights;
@@ -50,28 +52,27 @@ Tracer::Tracer() {
     this->depth_limit = 50;
     this->image = new unsigned char[width * height * channel];
 
-    Scenes::UseScene1(camera, world, lights);
+    Scenes::UseScene1(camera, world, lights, bg_color);
     world->BuildBVH();
 }
 
 void Tracer::Render() {
     auto time_start = std::chrono::high_resolution_clock::now();
-
-    int samples = 1000;
     std::atomic<size_t> counter = 0;
+
     cout << "Ray-tracing is running" << endl;
     tbb::parallel_for(tbb::blocked_range<int>(0, height * width, 692), [&](tbb::blocked_range<int>& r) {
         for(int index = r.begin(); index != r.end(); ++index) {
             int i = index / width;
             int j = index % width;
             auto color = glm::vec4(0.0f);
-            for(int sps = 0; sps < samples; ++sps) {
-                float u = ((float)j + utils::RandomFloat(0, 1)) / (float)width;
-                float v = ((float)i + utils::RandomFloat(0, 1)) / (float)height;
+            for(int sps = 0; sps < NUM_SAMPLE_RAYS; ++sps) {
+                float u = ((float)j + MagicRandom::Float(0, 1)) / (float)width;
+                float v = ((float)i + MagicRandom::Float(0, 1)) / (float)height;
                 Ray ray = camera.GetRay(u, v);
                 color += glm::vec4(Tracing(ray, 0), 1.0f);
             }
-            color /= (float)samples;
+            color /= (float)NUM_SAMPLE_RAYS;
             color.w = 1.0f;
             if (color.r != color.r)  color.r = 0.0f;
             if (color.g != color.g)  color.g = 0.0f;
@@ -94,7 +95,7 @@ void Tracer::Render() {
 glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
     HitRecord hit;
     if (world->Hit(ray, T_MIN, T_MAX, hit)) {
-        auto emitted = hit.material->Emitted(ray, hit);
+        auto emitted = hit.material->Emitted(ray, hit); //光源的直接光照
         ScatterRecord scatter;
         if (depth < depth_limit && hit.material->Scatter(ray, hit, scatter)) {
             if (scatter.is_sample) {  //蒙特卡罗采样
@@ -106,18 +107,13 @@ glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
                 Ray scattered = Ray(hit.position, direction);
                 return emitted + scatter.attenuation * hit.material->ScatterPDF(ray, hit, scattered) * Tracing(scattered, depth + 1) / prob;
             }
-            else {
+            else {  //不采样
                 return emitted + scatter.attenuation * Tracing(scatter.ray, depth + 1);
             }
         }
         else return emitted;
     }
-    else {
-//        float t = 0.5f * (ray.direction.y + 1.0f);
-//        auto color = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f - t) + glm::vec3(0.5f, 0.7f, 1.0f) * t;
-//        return color;
-        return glm::vec3(0.0f);
-    }
+    else return bg_color;
 }
 
 void Tracer::DrawPixel(int row, int col, glm::vec4 color) const {

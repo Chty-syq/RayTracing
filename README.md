@@ -10,7 +10,7 @@ This project implement an easy Monte Carlo Ray-tracer running on cpu, built with
 - [assimp](https://github.com/assimp/assimp) for mesh processing.
 
 This project refers to the following articles and the code is only used for learning. 
-s
+
 - [光线追踪器Ray Tracer：入门篇](https://yangwc.com/2019/05/08/RayTracer-Basis/)
 - [光线追踪器Ray Tracer：进阶篇](https://yangwc.com/2019/05/23/RayTracer-Advance/)
 

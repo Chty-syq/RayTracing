@@ -4,7 +4,7 @@
 
 #pragma once
 #include "core/ray.hpp"
-#include "sprites/aabb_box.hpp"
+#include "hittable/aabb_box.hpp"
 
 struct Material;
 

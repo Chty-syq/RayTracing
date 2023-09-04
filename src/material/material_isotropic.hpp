@@ -21,7 +21,7 @@ public:
 
 bool Isotropic::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
     scatter = {
-            .ray = Ray(hit.position, utils::RandomUnitVector()),
+            .ray = Ray(hit.position, MagicRandom::UnitVector()),
             .attenuation = albedo,
             .is_sample = true,
             .pdf = std::make_shared<PDFSphere>()

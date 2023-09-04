@@ -21,7 +21,7 @@ public:
 
 bool Metal::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
     scatter = {
-            .ray = Ray(hit.position, glm::reflect(in.direction, hit.normal) + utils::RandomUnitVector() * fuzz),
+            .ray = Ray(hit.position, glm::reflect(in.direction, hit.normal) + MagicRandom::UnitVector() * fuzz),
             .attenuation = albedo,
             .is_sample = false,
             .pdf = nullptr

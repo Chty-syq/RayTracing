@@ -10,5 +10,5 @@ class Texture {
 public:
     Texture() = default;
     virtual ~Texture() = default;
-    virtual glm::vec3 Sample(float u, float v) const = 0;
+    virtual glm::vec3 Sample(glm::vec2 tex_coord) const = 0;
 };

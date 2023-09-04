@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "sprites/hittable.hpp"
+#include "hittable/hittable.hpp"
 
 class Sphere: public Hittable {
 public:

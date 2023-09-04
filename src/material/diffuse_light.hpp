@@ -17,7 +17,7 @@ public:
 glm::vec3 DiffuseLight::Emitted(const Ray &in, const HitRecord &hit) const {
     auto tex_coord = hit.tex_coord;
     if (glm::dot(hit.normal, in.direction) < 0.0f)
-        return texture->Sample(tex_coord.x, tex_coord.y);
+        return texture->Sample(tex_coord);
     else
         return glm::vec3(0.0f);
 }

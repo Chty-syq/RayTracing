@@ -9,30 +9,6 @@
 #include <chrono>
 
 namespace utils {
-
-    inline std::mt19937& generator() {
-        static thread_local std::mt19937 gen(std::random_device{}());
-        return gen;
-    }
-
-    int RandomInt(int s, int t) {
-        std::uniform_int_distribution<int> dist(s, t);
-        return dist(generator());
-    }
-
-    float RandomFloat(float s, float t) {
-        std::uniform_real_distribution<float> dist(s, t);
-        return dist(generator());
-    }
-
-    glm::vec3 RandomUnitVector() {
-        glm::vec3 position;
-        do {
-            position = glm::vec3(RandomFloat(0, 1), RandomFloat(0, 1), RandomFloat(0, 1)) * 2.0f - glm::vec3(1.0f);
-        } while(glm::length(position) >= 1.0f);
-        return position;
-    }
-
     template<class T> void VectorMerge(vector<T>& v1, vector<T> v2) {
         v1.insert(v1.end(), v2.begin(), v2.end());
     }

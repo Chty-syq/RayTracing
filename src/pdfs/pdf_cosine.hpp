@@ -6,6 +6,7 @@
 
 #include "pdfs/pdf.hpp"
 #include "core/ortho_bases.hpp"
+#include "common/random.hpp"
 
 class PDFCosine: public PDF {
 private:
@@ -29,9 +30,9 @@ float PDFCosine::Value(glm::vec3 direction) const {
 }
 
 glm::vec3 PDFCosine::Sample() const {
-    float r1 = utils::RandomFloat(0, 1);
+    float r1 = MagicRandom::Float(0, 1);
     float phi = 2.0f * PI * r1;
-    float r2 = utils::RandomFloat(0, 1);
+    float r2 = MagicRandom::Float(0, 1);
     float cos_theta = sqrt(1.0f - r2);
     float sin_theta = sqrt(r2);
     float x = cos(phi) * sin_theta;

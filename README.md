@@ -1,18 +1,17 @@
-# Ray-tracing
+# Monte Carlo Ray Tracing
 
 ## 1. Description
 
-This project implement an easy Monte Carlo Ray-tracer running on cpu, built with the following third-party libs.
+This project implement an easy Monte Carlo ray tracer based on cpu, built with the following third-parties.
 
 - [GLM](https://github.com/g-truc/glm) for linear algebra calculation.
 - [stb_image](https://github.com/nothings/stb) for image rendering.
 - [tbb](https://github.com/oneapi-src/oneTBB) for parallel acceleration.
 - [assimp](https://github.com/assimp/assimp) for mesh processing.
 
-This project refers to the following articles and the code is only used for learning. 
+The principle could refer to my blog and the code is only used for learning. 
 
-- [光线追踪器Ray Tracer：入门篇](https://yangwc.com/2019/05/08/RayTracer-Basis/)
-- [光线追踪器Ray Tracer：进阶篇](https://yangwc.com/2019/05/23/RayTracer-Advance/)
+- [Monte Carlo Ray Tracing](http://blog.leanote.com/post/chty_syq/Ray-Tracing-1)
 
 
 ## 2. Environment

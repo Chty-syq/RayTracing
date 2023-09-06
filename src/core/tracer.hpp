@@ -52,7 +52,7 @@ Tracer::Tracer() {
     this->depth_limit = 50;
     this->image = new unsigned char[width * height * channel];
 
-    Scenes::UseScene1(camera, world, lights, bg_color);
+    Scenes::UseScene0(camera, world, lights, bg_color);
     world->BuildBVH();
 }
 
@@ -95,7 +95,7 @@ void Tracer::Render() {
 glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
     HitRecord hit;
     if (world->Hit(ray, T_MIN, T_MAX, hit)) {
-        auto emitted = hit.material->Emitted(ray, hit); //光源的直接光照
+        auto emitted = hit.material->Emitted(ray, hit); //光源自发光
         ScatterRecord scatter;
         if (depth < depth_limit && hit.material->Scatter(ray, hit, scatter)) {
             if (scatter.is_sample) {  //蒙特卡罗采样

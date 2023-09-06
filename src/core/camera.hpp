@@ -39,10 +39,10 @@ Camera::Camera(glm::vec3 camera_pos, glm::vec3 target): camera_pos(camera_pos) {
     camera_right = glm::normalize(glm::cross(camera_front, world_up));
     camera_up = glm::normalize(glm::cross(camera_right, camera_front));
 
-    float half_height = tan(glm::radians(fov * 0.5f));
+    float half_height = focus * tan(glm::radians(fov * 0.5f));
     float half_width = aspect * half_height;
 
-    lower_left_corner = camera_pos - half_width * camera_right - half_height * camera_up - camera_front;
+    lower_left_corner = camera_pos - half_width * camera_right - half_height * camera_up - focus * camera_front;
     horizontal = 2.0f * half_width * camera_right;
     vertical = 2.0f * half_height * camera_up;
 }

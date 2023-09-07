@@ -12,6 +12,8 @@
 #include <filesystem>
 #include <stb_image.h>
 #include <stb_image_write.h>
+#include <nlohmann/json.hpp>
+#include <fstream>
 #include "common/structs.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -28,6 +30,7 @@ using std::vector;
 using std::pair;
 using std::unique_ptr;
 using std::shared_ptr;
+using nlohmann::json;
 
 using VertexArr = std::vector<Vertex>;
 using IndiceArr = std::vector<int>;

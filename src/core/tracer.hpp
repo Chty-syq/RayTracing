@@ -31,10 +31,6 @@ class Tracer {
 private:
     int depth_limit{};
     int width, height, channel{};
-    glm::vec3 bg_color{};
-    Camera camera;
-    shared_ptr<HittableList> world;
-    shared_ptr<HittableList> lights;
 
 public:
     unsigned char* image;
@@ -52,8 +48,8 @@ Tracer::Tracer() {
     this->depth_limit = 50;
     this->image = new unsigned char[width * height * channel];
 
-    Scenes::UseScene0(camera, world, lights, bg_color);
-    world->BuildBVH();
+    Scene::LoadConfig(fs::current_path().parent_path() / "assets" / "scenes" / "cornell_box" / "config.json");
+    //Scene::LoadRandomSpheres();
 }
 
 void Tracer::Render() {
@@ -69,7 +65,7 @@ void Tracer::Render() {
             for(int sps = 0; sps < NUM_SAMPLE_RAYS; ++sps) {
                 float u = ((float)j + MagicRandom::Float(0, 1)) / (float)width;
                 float v = ((float)i + MagicRandom::Float(0, 1)) / (float)height;
-                Ray ray = camera.GetRay(u, v);
+                Ray ray = Scene::camera->GetRay(u, v);
                 color += glm::vec4(Tracing(ray, 0), 1.0f);
             }
             color /= (float)NUM_SAMPLE_RAYS;
@@ -94,13 +90,13 @@ void Tracer::Render() {
 
 glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
     HitRecord hit;
-    if (world->Hit(ray, T_MIN, T_MAX, hit)) {
+    if (Scene::objects->Hit(ray, T_MIN, T_MAX, hit)) {
         auto emitted = hit.material->Emitted(ray, hit); //光源自发光
         ScatterRecord scatter;
         if (depth < depth_limit && hit.material->Scatter(ray, hit, scatter)) {
             if (scatter.is_sample) {  //蒙特卡罗采样
-                auto pdf = lights->Empty() ? scatter.pdf :  //没有光源则仅从材质采样
-                        std::make_shared<PDFMixture>(scatter.pdf, std::make_shared<PDFHittable>(lights, hit.position));  //有光源则混合采样
+                auto pdf = Scene::lights->Empty() ? scatter.pdf :  //没有光源则仅从材质采样
+                        std::make_shared<PDFMixture>(scatter.pdf, std::make_shared<PDFHittable>(Scene::lights, hit.position));  //有光源则混合采样
 
                 auto direction = pdf->Sample();
                 auto prob = pdf->Value(direction);
@@ -113,7 +109,7 @@ glm::vec3 Tracer::Tracing(const Ray &ray, int depth) {
         }
         else return emitted;
     }
-    else return bg_color;
+    else return Scene::background;
 }
 
 void Tracer::DrawPixel(int row, int col, glm::vec4 color) const {

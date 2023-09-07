@@ -7,10 +7,16 @@
 #include <cmath>
 #include <thread>
 #include <chrono>
+#include "core/transformation.hpp"
 
 namespace utils {
     template<class T> void VectorMerge(vector<T>& v1, vector<T> v2) {
         v1.insert(v1.end(), v2.begin(), v2.end());
+    }
+
+    glm::vec3 Json2Vec3(const json& content) {
+        if (!content.is_array() || content.size() < 3)  throw std::runtime_error("Unexpected Behavior Converting Json");
+        return { float(content[0]), float(content[1]), float(content[2]) };
     }
 
     glm::vec3 EleWiseMin(glm::vec3 v1, glm::vec3 v2) {

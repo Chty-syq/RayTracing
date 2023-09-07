@@ -11,6 +11,7 @@ class DiffuseLight: public Material {
 public:
     shared_ptr<Texture> texture;
     explicit DiffuseLight(const shared_ptr<Texture>& texture): texture(texture) {}
+    explicit DiffuseLight(glm::vec3 color): texture(std::make_shared<TextureColor>(color)) {}
     glm::vec3 Emitted(const Ray &in, const HitRecord &hit) const override;
 };
 

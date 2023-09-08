@@ -15,7 +15,7 @@ namespace utils {
     }
 
     glm::vec3 Json2Vec3(const json& content) {
-        if (!content.is_array() || content.size() < 3)  throw std::runtime_error("Unexpected Behavior Converting Json");
+        if (!content.is_array() || content.size() != 3)  throw std::runtime_error("Unexpected Behavior Converting Json");
         return { float(content[0]), float(content[1]), float(content[2]) };
     }
 

@@ -10,88 +10,104 @@ namespace Scene {
     shared_ptr<HittableList> lights;
     glm::vec3 background;
 
-    shared_ptr<Material> ExtractMaterial(const json& content);
-    Transformation ExtractTransform(const json& content);
+    std::string config_path;
+
+    shared_ptr<Material> ExtractMaterial(const json &material);
+    shared_ptr<Texture> ExtractTexture(const json &albedo);
+    Transformation ExtractTransform(const json &item);
+    shared_ptr<Hittable> ExtractLight(const json &item);
+    shared_ptr<Hittable> ExtractObject(const json &item);
 
     void LoadConfig(const std::string &path);
     void LoadRandomSpheres();
 };
 
-Transformation Scene::ExtractTransform(const json& content) {
-    auto position = content.contains("position") ? utils::Json2Vec3(content["position"]) : Transformation::DEFAULT_POSITION;
-    auto rotate = content.contains("rotate") ? utils::Json2Vec3(content["rotate"]) : Transformation::DEFAULT_ROTATE;
-    auto size = content.contains("size") ? utils::Json2Vec3(content["size"]) : Transformation::DEFAULT_SIZE;
+Transformation Scene::ExtractTransform(const json &item) {
+    auto position = item.contains("position") ? utils::Json2Vec3(item["position"]) : Transformation::DEFAULT_POSITION;
+    auto rotate = item.contains("rotate") ? utils::Json2Vec3(item["rotate"]) : Transformation::DEFAULT_ROTATE;
+    auto size = item.contains("size") ? utils::Json2Vec3(item["size"]) : Transformation::DEFAULT_SIZE;
     return { position, rotate, size };
 }
 
-shared_ptr<Material> Scene::ExtractMaterial(const json& content) {
-    auto type = std::string(content["type"]);
-    if (type == "Lambertian") {
-        auto albedo = utils::Json2Vec3(content["albedo"]);
-        return std::make_shared<Lambertian>(albedo);
-    }
-    else if (type == "Isotropic") {
-        auto albedo = utils::Json2Vec3(content["albedo"]);
-        return std::make_shared<Isotropic>(albedo);
-    }
-    else if (type == "Dielectric") {
-        auto refract_idx = float(content["refract_idx"]);
-        return std::make_shared<Dielectric>(refract_idx);
-    }
+shared_ptr<Texture> Scene::ExtractTexture(const json &albedo) {
+    if (albedo.is_array())
+        return std::make_shared<TextureColor>(utils::Json2Vec3(albedo));
+    else
+        return std::make_shared<TextureImage>(fs::path(config_path).parent_path() / std::string(albedo));
+}
+
+shared_ptr<Material> Scene::ExtractMaterial(const json &material) {
+    auto type = std::string(material["type"]);
+    if (type == "Lambertian")           return std::make_shared<Lambertian>(ExtractTexture(material["albedo"]));
+    else if (type == "Isotropic")       return std::make_shared<Isotropic>(ExtractTexture(material["albedo"]));
+    else if (type == "Dielectric")      return std::make_shared<Dielectric>(float(material["refract_idx"]));
     else if (type == "Metal") {
-        auto albedo = utils::Json2Vec3(content["albedo"]);
-        auto fuzz = content.contains("fuzz") ? float(content["fuzz"]) : 0.0f;
+        auto albedo = ExtractTexture(material["albedo"]);
+        auto fuzz = material.contains("fuzz") ? float(material["fuzz"]) : 0.0f;
         return std::make_shared<Metal>(albedo, fuzz);
     }
-    return std::make_shared<Material>();
+    else if (type == "DiffuseLight")    return std::make_shared<DiffuseLight>(ExtractTexture(material["albedo"]));
+    else                                return std::make_shared<Material>();
+}
+
+shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
+    auto type = std::string(item["type"]);
+    if (type == "quad") {
+        auto transform = ExtractTransform(item);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<LightQuad>(material, transform);
+    }
+    else if (type == "sphere") {
+        auto center = utils::Json2Vec3(item["position"]);
+        auto radius = float(item["radius"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<LightSphere>(center, radius, material);
+    }
+    return nullptr;
+}
+
+shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
+    auto type = std::string(item["type"]);
+    if (type == "sphere") {
+        auto center = utils::Json2Vec3(item["position"]);
+        auto radius = float(item["radius"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Sphere>(center, radius, material);
+    }
+    else if (type == "mesh") {
+        auto mesh_path = fs::path(config_path).parent_path() / std::string(item["path"]);
+        auto material = ExtractMaterial(item["material"]);
+        auto transform = ExtractTransform(item);
+        return std::make_shared<Mesh>(mesh_path, material, transform);
+    }
+    return nullptr;
 }
 
 void Scene::LoadConfig(const std::string &path) {
+    config_path = path;
     std::ifstream f(path);
-    json content = json::parse(f);
+    json config = json::parse(f);
 
     camera = std::make_shared<Camera>(
-            utils::Json2Vec3(content["camera"]["position"]),
-            utils::Json2Vec3(content["camera"]["target"])
+            utils::Json2Vec3(config["camera"]["position"]),
+            utils::Json2Vec3(config["camera"]["target"])
             );
-    background = utils::Json2Vec3(content["background"]);
+    background = utils::Json2Vec3(config["background"]);
 
     objects = std::make_shared<HittableList>();
     lights = std::make_shared<HittableList>();
-    for(const auto &content_light : content["lights"]) {
-        auto type = std::string(content_light["type"]);
-        shared_ptr<Hittable> light;
-        if (type == "quad") {
-            auto color = utils::Json2Vec3(content_light["color"]);
-            light = std::make_shared<LightQuad>(std::make_shared<DiffuseLight>(color), ExtractTransform(content_light));
+    for(const auto &item : config["lights"]) {
+        auto light = ExtractLight(item);
+        if (light != nullptr) {
+            lights->AddHittable(light);
+            objects->AddHittable(light);
         }
-        else if (type == "sphere") {
-            auto center = utils::Json2Vec3(content_light["position"]);
-            auto radius = float(content_light["radius"]);
-            auto color = utils::Json2Vec3(content_light["color"]);
-            light = std::make_shared<LightSphere>(center, radius, std::make_shared<DiffuseLight>(color));
-        }
-        else continue;
-        lights->AddHittable(light);
-        objects->AddHittable(light);
     }
-    for(const auto &content_obj: content["hittable"]) {
-        auto type = std::string(content_obj["type"]);
-        shared_ptr<Hittable> object;
-        if (type == "sphere") {
-            auto center = utils::Json2Vec3(content_obj["position"]);
-            auto radius = float(content_obj["radius"]);
-            auto material = ExtractMaterial(content_obj["material"]);
-            object = std::make_shared<Sphere>(center, radius, material);
+    for(const auto &item: config["hittable"]) {
+        auto object = ExtractObject(item);
+        if (object != nullptr) {
+            objects->AddHittable(object);
         }
-        else if (type == "mesh") {
-            auto mesh_path = fs::path(path).parent_path() / std::string(content_obj["path"]);
-            auto material = ExtractMaterial(content_obj["material"]);
-            auto transform = ExtractTransform(content_obj);
-            object = std::make_shared<Mesh>(mesh_path, material, transform);
-        }
-        else continue;
-        objects->AddHittable(object);
     }
     objects->BuildBVH();
 }

@@ -9,10 +9,11 @@
 class Isotropic: public Material {
 public:
 private:
-    glm::vec3 albedo;
+    shared_ptr<Texture> albedo;
 
 public:
-    explicit Isotropic(glm::vec3 albedo): albedo(albedo) {}
+    explicit Isotropic(glm::vec3 albedo): albedo(std::make_shared<TextureColor>(albedo)) {}
+    explicit Isotropic(const shared_ptr<Texture>& albedo): albedo(albedo) {}
     ~Isotropic() override = default;
 
     bool Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const override;
@@ -22,7 +23,7 @@ public:
 bool Isotropic::Scatter(const Ray &in, const HitRecord &hit, ScatterRecord &scatter) const {
     scatter = {
             .ray = Ray(hit.position, MagicRandom::UnitVector()),
-            .attenuation = albedo,
+            .attenuation = albedo->Sample(hit.tex_coord),
             .is_sample = true,
             .pdf = std::make_shared<PDFSphere>()
     };

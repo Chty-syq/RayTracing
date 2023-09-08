@@ -12,7 +12,6 @@
 class Lambertian: public Material { //理想散射材质
 private:
     shared_ptr<Texture> albedo;
-    //glm::vec3 albedo;
 
 public:
     explicit Lambertian(glm::vec3 albedo): albedo(std::make_shared<TextureColor>(albedo)) {}

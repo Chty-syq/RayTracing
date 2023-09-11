@@ -91,7 +91,7 @@
             "type": "mesh",
             "path": "cbox_largebox.obj",
             "material": {
-                "type": "Lambertian",
+                "type": "Metal",
                 "albedo": [0.73, 0.73, 0.73]
             },
             "size": [0.01, 0.01, 0.01]

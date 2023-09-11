@@ -5,9 +5,10 @@
 #pragma once
 
 #include <tbb/parallel_for.h>
-#include "hittable//hittable_list.hpp"
+#include "hittable/hittable_list.hpp"
 #include "hittable/sphere.hpp"
 #include "hittable/mesh.hpp"
+#include "hittable/quad.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"

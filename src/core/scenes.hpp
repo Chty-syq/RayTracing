@@ -80,6 +80,11 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         auto transform = ExtractTransform(item);
         return std::make_shared<Mesh>(mesh_path, material, transform);
     }
+    else if (type == "quad") {
+        auto material = ExtractMaterial(item["material"]);
+        auto transform = ExtractTransform(item);
+        return std::make_shared<Quad>(material, transform);
+    }
     return nullptr;
 }
 

@@ -24,7 +24,7 @@ namespace Scene {
 
 Transformation Scene::ExtractTransform(const json &item) {
     auto position = item.contains("position") ? utils::Json2Vec3(item["position"]) : Transformation::DEFAULT_POSITION;
-    auto rotate = item.contains("rotate") ? utils::Json2Vec3(item["rotate"]) : Transformation::DEFAULT_ROTATE;
+    auto rotate = item.contains("rotate") ? utils::Json2Quat(item["rotate"]) : Transformation::DEFAULT_ROTATE;
     auto size = item.contains("size") ? utils::Json2Vec3(item["size"]) : Transformation::DEFAULT_SIZE;
     return { position, rotate, size };
 }
@@ -58,7 +58,7 @@ shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
         return std::make_shared<LightQuad>(material, transform);
     }
     else if (type == "sphere") {
-        auto center = utils::Json2Vec3(item["position"]);
+        auto center = utils::Json2Vec3(item["center"]);
         auto radius = float(item["radius"]);
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<LightSphere>(center, radius, material);
@@ -69,7 +69,7 @@ shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
 shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
     auto type = std::string(item["type"]);
     if (type == "sphere") {
-        auto center = utils::Json2Vec3(item["position"]);
+        auto center = utils::Json2Vec3(item["center"]);
         auto radius = float(item["radius"]);
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<Sphere>(center, radius, material);

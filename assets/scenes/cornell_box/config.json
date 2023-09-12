@@ -7,7 +7,7 @@
     "lights": [
         {
             "type": "sphere",
-            "position": [1.855, 2.3, 1.69],
+            "center": [1.855, 2.3, 1.69],
             "radius": 0.65,
             "material": {
                 "type": "DiffuseLight",
@@ -17,6 +17,7 @@
         {
             "type": "quad",
             "position": [2.93, 5.478, 3.195],
+            "rotate": [90, 1, 0, 0],
             "material": {
                 "type": "DiffuseLight",
                 "albedo": [1.0, 1.0, 1.0]
@@ -24,15 +25,6 @@
         }
     ],
     "hittable": [
-        {
-            "type": "mesh",
-            "path": "cbox_luminaire.obj",
-            "material": {
-                "type": "Lambertian",
-                "albedo": [0.73, 0.73, 0.73]
-            },
-            "size": [0.01, 0.01, 0.01]
-        },
         {
             "type": "mesh",
             "path": "cbox_floor.obj",

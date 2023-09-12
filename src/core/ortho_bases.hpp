@@ -10,6 +10,7 @@ class OrthoBases { //正交基
 public:
     glm::vec3 basis[3]{};
     explicit OrthoBases(glm::vec3 normal);
+    OrthoBases(glm::vec3 x, glm::vec3 y, glm::vec3 z);
     glm::vec3 GetLocal(glm::vec3 position);
 };
 
@@ -20,8 +21,16 @@ OrthoBases::OrthoBases(glm::vec3 normal) {
     this->basis[0] = glm::normalize(glm::cross(this->basis[2], this->basis[1]));
 }
 
+OrthoBases::OrthoBases(glm::vec3 x, glm::vec3 y, glm::vec3 z) {
+    this->basis[0] = glm::normalize(x);
+    this->basis[1] = glm::normalize(y);
+    this->basis[2] = glm::normalize(z);
+}
+
+
 glm::vec3 OrthoBases::GetLocal(glm::vec3 position) {
     auto local = glm::vec3(0.0f);
     for(int i = 0; i < 3; ++i)  local += basis[i] * position[i];
     return local;
 }
+

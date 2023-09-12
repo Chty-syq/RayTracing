@@ -17,7 +17,9 @@ public:
 
 glm::vec3 LightQuad::Random(glm::vec3 origin) const {
     auto center = transformation.position;
-    auto point = center + glm::vec3(MagicRandom::Float(-0.5, 0.5) * width, 0.0f, MagicRandom::Float(-0.5, 0.5) * height);
+    auto axis_x = this->bases->basis[0];
+    auto axis_y = this->bases->basis[1];
+    auto point = center + MagicRandom::Float(-1, 1) * axis_x + MagicRandom::Float(-1, 1) * axis_y;
     return point - origin;
 }
 

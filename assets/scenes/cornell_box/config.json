@@ -16,11 +16,13 @@
         },
         {
             "type": "quad",
-            "position": [2.93, 5.478, 3.195],
-            "rotate": [90, 1, 0, 0],
             "material": {
                 "type": "DiffuseLight",
                 "albedo": [1.0, 1.0, 1.0]
+            },
+            "transform": {
+                "position": [2.93, 5.478, 3.195],
+                "rotate": [90, 1, 0, 0]
             }
         }
     ],
@@ -32,7 +34,9 @@
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -41,7 +45,9 @@
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -50,7 +56,9 @@
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -59,7 +67,9 @@
                 "type": "Lambertian",
                 "albedo": [0.12, 0.45, 0.15]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -68,7 +78,9 @@
                 "type": "Lambertian",
                 "albedo": [0.65, 0.05, 0.05]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -77,7 +89,9 @@
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         },
         {
             "type": "mesh",
@@ -86,7 +100,9 @@
                 "type": "Metal",
                 "albedo": [0.73, 0.73, 0.73]
             },
-            "size": [0.01, 0.01, 0.01]
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
         }
     ]
 }

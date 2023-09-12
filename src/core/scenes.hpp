@@ -14,7 +14,7 @@ namespace Scene {
 
     shared_ptr<Material> ExtractMaterial(const json &material);
     shared_ptr<Texture> ExtractTexture(const json &albedo);
-    Transformation ExtractTransform(const json &item);
+    Transformation ExtractTransform(const json &transform);
     shared_ptr<Hittable> ExtractLight(const json &item);
     shared_ptr<Hittable> ExtractObject(const json &item);
 
@@ -22,10 +22,10 @@ namespace Scene {
     void LoadRandomSpheres();
 };
 
-Transformation Scene::ExtractTransform(const json &item) {
-    auto position = item.contains("position") ? utils::Json2Vec3(item["position"]) : Transformation::DEFAULT_POSITION;
-    auto rotate = item.contains("rotate") ? utils::Json2Quat(item["rotate"]) : Transformation::DEFAULT_ROTATE;
-    auto size = item.contains("size") ? utils::Json2Vec3(item["size"]) : Transformation::DEFAULT_SIZE;
+Transformation Scene::ExtractTransform(const json &transform) {
+    auto position = transform.contains("position") ? utils::Json2Vec3(transform["position"]) : Transformation::DEFAULT_POSITION;
+    auto rotate = transform.contains("rotate") ? utils::Json2Quat(transform["rotate"]) : Transformation::DEFAULT_ROTATE;
+    auto size = transform.contains("size") ? utils::Json2Vec3(transform["size"]) : Transformation::DEFAULT_SIZE;
     return { position, rotate, size };
 }
 
@@ -53,7 +53,7 @@ shared_ptr<Material> Scene::ExtractMaterial(const json &material) {
 shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
     auto type = std::string(item["type"]);
     if (type == "quad") {
-        auto transform = ExtractTransform(item);
+        auto transform = ExtractTransform(item["transform"]);
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<LightQuad>(material, transform);
     }
@@ -77,12 +77,12 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
     else if (type == "mesh") {
         auto mesh_path = fs::path(config_path).parent_path() / std::string(item["path"]);
         auto material = ExtractMaterial(item["material"]);
-        auto transform = ExtractTransform(item);
+        auto transform = ExtractTransform(item["transform"]);
         return std::make_shared<Mesh>(mesh_path, material, transform);
     }
     else if (type == "quad") {
         auto material = ExtractMaterial(item["material"]);
-        auto transform = ExtractTransform(item);
+        auto transform = ExtractTransform(item["transform"]);
         return std::make_shared<Quad>(material, transform);
     }
     return nullptr;

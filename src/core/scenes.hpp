@@ -33,7 +33,7 @@ shared_ptr<Texture> Scene::ExtractTexture(const json &albedo) {
     if (albedo.is_array())
         return std::make_shared<TextureColor>(utils::Json2Vec3(albedo));
     else
-        return std::make_shared<TextureImage>(fs::path(config_path).parent_path() / std::string(albedo));
+        return std::make_shared<TextureImage>(fs::current_path().parent_path() / "assets" / "textures" / std::string(albedo));
 }
 
 shared_ptr<Material> Scene::ExtractMaterial(const json &material) {
@@ -75,7 +75,7 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         return std::make_shared<Sphere>(center, radius, material);
     }
     else if (type == "mesh") {
-        auto mesh_path = fs::path(config_path).parent_path() / std::string(item["path"]);
+        auto mesh_path = fs::current_path().parent_path() / "assets" / "mesh_triangle" / std::string(item["path"]);
         auto material = ExtractMaterial(item["material"]);
         auto transform = ExtractTransform(item["transform"]);
         return std::make_shared<Mesh>(mesh_path, material, transform);

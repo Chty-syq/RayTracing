@@ -7,15 +7,20 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <igl/ray_mesh_intersect.h>
+#include <igl/AABB.h>
 #include <queue>
 #include "hittable/hittable.hpp"
 #include "core/transformation.hpp"
 #include "common/structs.hpp"
 #include "common/utils.hpp"
+#include "common/convert.hpp"
 
 class Mesh: public Hittable {
 private:
-    vector<int> ranks; //排序用
+    igl::AABB<Eigen::MatrixXd, 3> tree;
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
     void ProcessNode(aiNode *node, const aiScene *scene);
     void ProcessMesh(aiMesh *mesh, const aiScene *scene);
 
@@ -23,14 +28,11 @@ public:
     shared_ptr<Material> material;
     VertexArr vertices;
     IndiceArr indices;
-    int num_vertices{};
-    int num_faces{};
     Transformation transformation;
 
     Mesh(const std::string& path, const shared_ptr<Material>& material, Transformation transformation);
     ~Mesh() override = default;
 
-    bool HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit, Vertex p0, Vertex p1, Vertex p2, glm::vec3 normal) const;
     bool Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const override;
     void GetAABBBox() override;
 };
@@ -43,20 +45,9 @@ Mesh::Mesh(const std::string &path, const shared_ptr<Material> &material, Transf
     }
     //this->directory = path.substr(0, path.find_last_of('/'));
     this->ProcessNode(scene->mRootNode, scene);
-//    this->num_vertices = (int)vertices.size();
-//    this->num_faces = (int)indices.size() / 3;
-//    for (int i = 0; i < num_faces; ++i)  ranks.push_back(i);
-//    auto face_center = [&](int index) {
-//        auto p0 = vertices[indices[index * 3 + 0]];
-//        auto p1 = vertices[indices[index * 3 + 1]];
-//        auto p2 = vertices[indices[index * 3 + 2]];
-//        return (p0.position + p1.position + p2.position) / 3.0f;
-//    };
-//    std::sort(ranks.begin(), ranks.end(), [&](const int r1, const int r2) {
-//        auto c0 = face_center(ranks[r1]);
-//        auto c1 = face_center(ranks[r2]);
-//        return c0.x < c1.x;
-//    });
+    this->V = converter::VertexArr2Eigen(this->vertices);
+    this->F = converter::IndiceArr2Eigen(this->indices);
+    this->tree.init(this->V, this->F);
     importer.FreeScene();
 }
 
@@ -90,62 +81,35 @@ void Mesh::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
     }
     utils::VectorMerge(vertices, m_vertices);
     utils::VectorMerge(indices, m_indices);
-    //vertices.insert(vertices.end(), m_vertices.begin(), m_vertices.end());
-//    std::string diffuse_map = "empty";
-//    std::string specular_map = "empty";
-//    if(mesh->mMaterialIndex >= 0) {
-//        auto material = scene->mMaterials[mesh->mMaterialIndex];
-//        diffuse_map = this->ProcessTexture(material, aiTextureType_DIFFUSE);
-//        specular_map = this->ProcessTexture(material, aiTextureType_SPECULAR);
-//    }
-//    this->meshes.emplace_back(vertices, indices, diffuse_map, specular_map);
-}
-
-bool Mesh::HitTriangle(const Ray &ray, float t_min, float t_max, HitRecord &hit, Vertex p0, Vertex p1, Vertex p2, glm::vec3 normal) const {
-    if (glm::dot(ray.direction, normal) == 0.0f)  return false;
-    float t = (glm::dot(p0.position, normal) - glm::dot(ray.origin, normal)) / glm::dot(ray.direction, normal);
-    if (t < t_min || t > t_max)  return false;
-
-    auto r = ray.PointAt(t) - p0.position;
-    auto q1 = p1.position - p0.position;
-    auto q2 = p2.position - p0.position;
-    auto q1q1 = glm::dot(q1, q1);
-    auto q2q2 = glm::dot(q2, q2);
-    auto q1q2 = glm::dot(q1, q2);
-    float determinant = 1.0f / (q1q1 * q2q2 - q1q2 * q1q2);
-    float w1 = determinant * (q2q2 * glm::dot(r, q1) - q1q2 * glm::dot(r, q2));
-    float w2 = determinant * (q1q1 * glm::dot(r, q2) - q1q2 * glm::dot(r, q1));
-    float w0 = 1.0f - w1 - w2;
-
-    if (w1 < 0.0f || w2 < 0.0f || w1 + w2 > 1.0f)  return false;
-    hit = {
-            .t = t,
-            .position = ray.PointAt(t),
-            .normal = glm::normalize(p0.normal * w0 + p1.normal * w1 + p2.normal * w2),
-            .tex_coord = p0.tex_coord * w0 + p1.tex_coord * w1 + p2.tex_coord * w2,
-            .material = material
-    };
-    if (glm::dot(hit.normal, ray.direction) > 0.0f)
-        hit.normal = -hit.normal;
-    return true;
 }
 
 bool Mesh::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
-    bool hit_any = false;
-    float t_smallest = 1e9;
-    for(int i = 0; i < indices.size(); i += 3) {
-        auto p0 = vertices[indices[i + 0]];
-        auto p1 = vertices[indices[i + 1]];
-        auto p2 = vertices[indices[i + 2]];
-        auto normal = glm::normalize(glm::cross(p1.position - p0.position, p2.position - p0.position)); //face normal
-        HitRecord temp;
-        if (this->HitTriangle(ray, t_min, t_max, temp, p0, p1, p2, normal) && temp.t < t_smallest) {
-            hit = temp;
-            t_smallest = temp.t;
-            hit_any = true;
-        }
+    auto hits = vector<igl::Hit>();
+    auto o = converter::Vec2Eigen(ray.origin);
+    auto v = converter::Vec2Eigen(ray.direction);
+
+    tree.intersect_ray(this->V, this->F, o, v, hits);
+    std::sort(hits.begin(), hits.end(), [](auto &h1, auto &h2) { return h1.t < h2.t; });
+
+    for(const auto& point: hits) if(point.t >= t_min && point.t <= t_max) {
+        float w1 = point.u;
+        float w2 = point.v;
+        float w0 = 1 - w1 - w2;
+        auto p0 = vertices[this->F(point.id, 0)];
+        auto p1 = vertices[this->F(point.id, 1)];
+        auto p2 = vertices[this->F(point.id, 2)];
+        hit = {
+                .t = point.t,
+                .position = ray.PointAt(point.t),
+                .normal = glm::normalize(p0.normal * w0 + p1.normal * w1 + p2.normal * w2),
+                .tex_coord = p0.tex_coord * w0 + p1.tex_coord * w1 + p2.tex_coord * w2,
+                .material = material
+        };
+        if (glm::dot(hit.normal, ray.direction) > 0.0f)
+            hit.normal = -hit.normal;
+        return true;
     }
-    return hit_any;
+    return false;
 }
 
 void Mesh::GetAABBBox() {

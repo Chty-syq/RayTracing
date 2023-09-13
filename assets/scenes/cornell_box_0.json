@@ -1,0 +1,108 @@
+{
+    "camera": {
+        "position": [2.78, 2.73, -8.0],
+        "target": [2.78, 2.73, -7.99]
+    },
+    "background": [0, 0, 0],
+    "lights": [
+        {
+            "type": "quad",
+            "material": {
+                "type": "DiffuseLight",
+                "albedo": [1.0, 1.0, 1.0]
+            },
+            "transform": {
+                "position": [2.93, 5.478, 3.195],
+                "rotate": [90, 1, 0, 0]
+            }
+        }
+    ],
+    "hittable": [
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_floor.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.73, 0.73, 0.73]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_ceiling.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.73, 0.73, 0.73]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_back.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.73, 0.73, 0.73]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_greenwall.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.12, 0.45, 0.15]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_redwall.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.65, 0.05, 0.05]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_smallbox.obj",
+            "material": {
+                "type": "Lambertian",
+                "albedo": [0.73, 0.73, 0.73]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "mesh",
+            "path": "cornell_box/cbox_largebox.obj",
+            "material": {
+                "type": "Metal",
+                "albedo": [0.73, 0.73, 0.73]
+            },
+            "transform": {
+                "size": [0.01, 0.01, 0.01]
+            }
+        },
+        {
+            "type": "sphere",
+            "center": [1.855, 2.3, 1.69],
+            "radius": 0.65,
+            "material": {
+                "type": "Dielectric",
+                "refract_idx": 1.5
+            }
+        }
+    ]
+}

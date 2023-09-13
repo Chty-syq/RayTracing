@@ -6,15 +6,6 @@
     "background": [0, 0, 0],
     "lights": [
         {
-            "type": "sphere",
-            "center": [1.855, 2.3, 1.69],
-            "radius": 0.65,
-            "material": {
-                "type": "DiffuseLight",
-                "albedo": [1.0, 0.85, 0.73]
-            }
-        },
-        {
             "type": "quad",
             "material": {
                 "type": "DiffuseLight",
@@ -22,14 +13,15 @@
             },
             "transform": {
                 "position": [2.93, 5.478, 3.195],
-                "rotate": [90, 1, 0, 0]
+                "rotate": [90, 1, 0, 0],
+                "size": [1.5, 1.5, 1.5]
             }
         }
     ],
     "hittable": [
         {
             "type": "mesh",
-            "path": "cbox_floor.obj",
+            "path": "cornell_box/cbox_floor.obj",
             "material": {
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
@@ -40,7 +32,7 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_ceiling.obj",
+            "path": "cornell_box/cbox_ceiling.obj",
             "material": {
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
@@ -51,7 +43,7 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_back.obj",
+            "path": "cornell_box/cbox_back.obj",
             "material": {
                 "type": "Lambertian",
                 "albedo": [0.73, 0.73, 0.73]
@@ -62,7 +54,7 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_greenwall.obj",
+            "path": "cornell_box/cbox_greenwall.obj",
             "material": {
                 "type": "Lambertian",
                 "albedo": [0.12, 0.45, 0.15]
@@ -73,7 +65,7 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_redwall.obj",
+            "path": "cornell_box/cbox_redwall.obj",
             "material": {
                 "type": "Lambertian",
                 "albedo": [0.65, 0.05, 0.05]
@@ -84,9 +76,9 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_smallbox.obj",
+            "path": "cornell_box/cbox_largebox.obj",
             "material": {
-                "type": "Lambertian",
+                "type": "Metal",
                 "albedo": [0.73, 0.73, 0.73]
             },
             "transform": {
@@ -95,13 +87,15 @@
         },
         {
             "type": "mesh",
-            "path": "cbox_largebox.obj",
+            "path": "cornell_box/Marry.obj",
             "material": {
-                "type": "Metal",
-                "albedo": [0.73, 0.73, 0.73]
+                "type": "DiffuseLight",
+                "albedo": "container.jpg"
             },
             "transform": {
-                "size": [0.01, 0.01, 0.01]
+                "size": [0.8, 0.8, 0.8],
+                "rotate": [45, 0, 1, 0],
+                "position": [2.0, 0, 1.0]
             }
         }
     ]

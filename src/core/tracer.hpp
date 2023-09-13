@@ -48,9 +48,6 @@ Tracer::Tracer() {
     this->channel = 4;
     this->depth_limit = 50;
     this->image = new unsigned char[width * height * channel];
-
-    Scene::LoadConfig(fs::current_path().parent_path() / "assets" / "scenes" / "cornell_box" / "config.json");
-    //Scene::LoadRandomSpheres();
 }
 
 void Tracer::Render() {

@@ -9,6 +9,7 @@ This project implement an easy Monte Carlo ray tracer based on cpu, built with t
 - [tbb](https://github.com/oneapi-src/oneTBB) for parallel acceleration.
 - [assimp](https://github.com/assimp/assimp) for mesh processing.
 - [nlohmann_json](https://github.com/nlohmann/json) for json analysis.
+- [igl](https://github.com/libigl/libigl.git) for ray-mesh intersection.
 
 The principle could refer to my blog and the code is only used for learning. 
 

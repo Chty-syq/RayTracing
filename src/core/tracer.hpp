@@ -4,30 +4,6 @@
 
 #pragma once
 
-#include <tbb/parallel_for.h>
-#include "hittable/hittable_list.hpp"
-#include "hittable/sphere.hpp"
-#include "hittable/mesh.hpp"
-#include "hittable/quad.hpp"
-#include "material/material_lambertian.hpp"
-#include "material/material_metal.hpp"
-#include "material/material_dielectric.hpp"
-#include "material/material_isotropic.hpp"
-#include "material/diffuse_light.hpp"
-#include "texture/texture_image.hpp"
-#include "texture/texture_color.hpp"
-#include "pdfs/pdf_cosine.hpp"
-#include "pdfs/pdf_hittable.hpp"
-#include "pdfs/pdf_mixture.hpp"
-#include "pdfs/pdf_sphere.hpp"
-#include "lights/light_quad.hpp"
-#include "lights/light_sphere.hpp"
-#include "core/ortho_bases.hpp"
-#include "core/camera.hpp"
-#include "core/scenes.hpp"
-#include "common/utils.hpp"
-#include "common/random.hpp"
-
 class Tracer {
 private:
     int depth_limit{};

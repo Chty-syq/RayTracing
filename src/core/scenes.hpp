@@ -10,8 +10,6 @@ namespace Scene {
     shared_ptr<HittableList> lights;
     glm::vec3 background;
 
-    std::string config_path;
-
     shared_ptr<Material> ExtractMaterial(const json &material);
     shared_ptr<Texture> ExtractTexture(const json &albedo);
     Transformation ExtractTransform(const json &transform);
@@ -22,16 +20,44 @@ namespace Scene {
     void LoadRandomSpheres();
 };
 
+void Scene::LoadConfig(const std::string &path) {
+    std::ifstream f(path);
+    json config = json::parse(f);
+
+    camera = std::make_shared<Camera>(
+            converter::Json2Vec3(config["camera"]["position"]),
+            converter::Json2Vec3(config["camera"]["target"])
+    );
+    background = converter::Json2Vec3(config["background"]);
+
+    objects = std::make_shared<HittableList>();
+    lights = std::make_shared<HittableList>();
+    for(const auto &item : config["lights"]) {
+        auto light = ExtractLight(item);
+        if (light != nullptr) {
+            lights->AddHittable(light);
+            objects->AddHittable(light);
+        }
+    }
+    for(const auto &item: config["hittable"]) {
+        auto object = ExtractObject(item);
+        if (object != nullptr) {
+            objects->AddHittable(object);
+        }
+    }
+    objects->BuildBVH();
+}
+
 Transformation Scene::ExtractTransform(const json &transform) {
-    auto position = transform.contains("position") ? utils::Json2Vec3(transform["position"]) : Transformation::DEFAULT_POSITION;
-    auto rotate = transform.contains("rotate") ? utils::Json2Quat(transform["rotate"]) : Transformation::DEFAULT_ROTATE;
-    auto size = transform.contains("size") ? utils::Json2Vec3(transform["size"]) : Transformation::DEFAULT_SIZE;
+    auto position = transform.contains("position") ? converter::Json2Vec3(transform["position"]) : Transformation::DEFAULT_POSITION;
+    auto rotate = transform.contains("rotate") ? converter::Json2Quat(transform["rotate"]) : Transformation::DEFAULT_ROTATE;
+    auto size = transform.contains("size") ? converter::Json2Vec3(transform["size"]) : Transformation::DEFAULT_SIZE;
     return { position, rotate, size };
 }
 
 shared_ptr<Texture> Scene::ExtractTexture(const json &albedo) {
     if (albedo.is_array())
-        return std::make_shared<TextureColor>(utils::Json2Vec3(albedo));
+        return std::make_shared<TextureColor>(converter::Json2Vec3(albedo));
     else
         return std::make_shared<TextureImage>(fs::current_path().parent_path() / "assets" / "textures" / std::string(albedo));
 }
@@ -58,10 +84,17 @@ shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
         return std::make_shared<LightQuad>(material, transform);
     }
     else if (type == "sphere") {
-        auto center = utils::Json2Vec3(item["center"]);
+        auto center = converter::Json2Vec3(item["center"]);
         auto radius = float(item["radius"]);
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<LightSphere>(center, radius, material);
+    }
+    else if (type == "circle") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<LightCircle>(center, radius, normal, material);
     }
     return nullptr;
 }
@@ -69,7 +102,7 @@ shared_ptr<Hittable> Scene::ExtractLight(const json &item) {
 shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
     auto type = std::string(item["type"]);
     if (type == "sphere") {
-        auto center = utils::Json2Vec3(item["center"]);
+        auto center = converter::Json2Vec3(item["center"]);
         auto radius = float(item["radius"]);
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<Sphere>(center, radius, material);
@@ -85,36 +118,14 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         auto transform = ExtractTransform(item["transform"]);
         return std::make_shared<Quad>(material, transform);
     }
+    else if (type == "circle") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Circle>(center, radius, normal, material);
+    }
     return nullptr;
-}
-
-void Scene::LoadConfig(const std::string &path) {
-    config_path = path;
-    std::ifstream f(path);
-    json config = json::parse(f);
-
-    camera = std::make_shared<Camera>(
-            utils::Json2Vec3(config["camera"]["position"]),
-            utils::Json2Vec3(config["camera"]["target"])
-            );
-    background = utils::Json2Vec3(config["background"]);
-
-    objects = std::make_shared<HittableList>();
-    lights = std::make_shared<HittableList>();
-    for(const auto &item : config["lights"]) {
-        auto light = ExtractLight(item);
-        if (light != nullptr) {
-            lights->AddHittable(light);
-            objects->AddHittable(light);
-        }
-    }
-    for(const auto &item: config["hittable"]) {
-        auto object = ExtractObject(item);
-        if (object != nullptr) {
-            objects->AddHittable(object);
-        }
-    }
-    objects->BuildBVH();
 }
 
 void Scene::LoadRandomSpheres() {

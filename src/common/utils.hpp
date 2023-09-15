@@ -14,18 +14,6 @@ namespace utils {
         v1.insert(v1.end(), v2.begin(), v2.end());
     }
 
-    glm::vec3 Json2Vec3(const json &content) {
-        if (!content.is_array() || content.size() != 3)  throw std::runtime_error("Unexpected Behavior Converting Json");
-        return { float(content[0]), float(content[1]), float(content[2]) };
-    }
-
-    glm::quat Json2Quat(const json &content) {
-        if (!content.is_array() || content.size() != 4)  throw std::runtime_error("Unexpected Behavior Converting Json");
-        auto angle = glm::radians(float(content[0]));
-        auto axis = glm::vec3(float(content[1]), float(content[2]), float(content[3]));
-        return glm::angleAxis(angle, axis);
-    }
-
     glm::vec3 EleWiseMin(glm::vec3 v1, glm::vec3 v2) {
         return { std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z) };
     }

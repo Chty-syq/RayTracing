@@ -125,6 +125,38 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<Circle>(center, radius, normal, material);
     }
+    else if (type == "cylinder_face") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto height = float(item["height"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<CylinderFace>(center, radius, height, normal, material);
+    }
+    else if (type == "cylinder") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto height = float(item["height"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Cylinder>(center, radius, height, normal, material);
+    }
+    else if (type == "cone_face") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto height = float(item["height"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<ConeFace>(center, radius, height, normal, material);
+    }
+    else if (type == "cone") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto height = float(item["height"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Cone>(center, radius, height, normal, material);
+    }
     return nullptr;
 }
 

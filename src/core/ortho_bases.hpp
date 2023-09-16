@@ -11,6 +11,7 @@ public:
     glm::vec3 basis[3]{};
     explicit OrthoBases(glm::vec3 normal);
     OrthoBases(glm::vec3 x, glm::vec3 y, glm::vec3 z);
+    glm::vec3 GetWorld(glm::vec3 position);
     glm::vec3 GetLocal(glm::vec3 position);
 };
 
@@ -28,9 +29,15 @@ OrthoBases::OrthoBases(glm::vec3 x, glm::vec3 y, glm::vec3 z) {
 }
 
 
+glm::vec3 OrthoBases::GetWorld(glm::vec3 position) {
+    auto world = glm::vec3(0.0f);
+    for(int i = 0; i < 3; ++i)  world += basis[i] * position[i];
+    return world;
+}
+
 glm::vec3 OrthoBases::GetLocal(glm::vec3 position) {
     auto local = glm::vec3(0.0f);
-    for(int i = 0; i < 3; ++i)  local += basis[i] * position[i];
+    for(int i = 0; i < 3; ++i)  local[i] = glm::dot(position, basis[i]);
     return local;
 }
 

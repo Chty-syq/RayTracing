@@ -41,5 +41,5 @@ glm::vec3 LightSphere::Random(glm::vec3 origin) const {
     float z = cos_theta;
 
     OrthoBases bases(oc);
-    return bases.GetLocal(glm::vec3(x, y, z));
+    return bases.GetWorld(glm::vec3(x, y, z));
 }

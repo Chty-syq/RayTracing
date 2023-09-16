@@ -38,5 +38,5 @@ glm::vec3 PDFCosine::Sample() const {
     float x = cos(phi) * sin_theta;
     float y = sin(phi) * sin_theta;
     float z = cos_theta;
-    return axis->GetLocal(glm::vec3(x, y, z));
+    return axis->GetWorld(glm::vec3(x, y, z));
 }

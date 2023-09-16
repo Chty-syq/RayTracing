@@ -4,6 +4,8 @@
 #include "hittable/mesh.hpp"
 #include "hittable/quad.hpp"
 #include "hittable/circle.hpp"
+#include "hittable/cylinder.hpp"
+#include "hittable/cone.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"

@@ -28,7 +28,7 @@ protected:
 };
 
 bool CylinderFace::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
-    glm::vec3 oc = ray.origin - center;
+    auto oc = ray.origin - center;
     float oc_dot_a = glm::dot(oc, this->axis->basis[0]);
     float oc_dot_b = glm::dot(oc, this->axis->basis[1]);
     float v_dot_a = glm::dot(ray.direction, this->axis->basis[0]);

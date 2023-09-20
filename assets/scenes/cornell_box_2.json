@@ -117,6 +117,17 @@
                 "type": "DiffuseLight",
                 "albedo": "container.jpg"
             }
+        },
+        {
+            "type": "torus",
+            "center": [3.33, 1.0, 1.195],
+            "radius": 0.4,
+            "radius_cube": 0.1,
+            "normal": [0, 1, 1],
+            "material": {
+                "type": "DiffuseLight",
+                "albedo": "container.jpg"
+            }
         }
     ]
 }

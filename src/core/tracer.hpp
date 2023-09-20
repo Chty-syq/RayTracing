@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <tbb/parallel_for.h>
 
 class Tracer {
 private:

@@ -157,6 +157,14 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<Cone>(center, radius, height, normal, material);
     }
+    else if (type == "torus") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = float(item["radius"]);
+        auto radius_cube = float(item["radius_cube"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Torus>(center, radius, radius_cube, normal, material);
+    }
     return nullptr;
 }
 

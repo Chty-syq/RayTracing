@@ -7,6 +7,7 @@
 #include <cmath>
 #include <thread>
 #include <chrono>
+#include <mutex>
 #include "core/transformation.hpp"
 
 namespace utils {

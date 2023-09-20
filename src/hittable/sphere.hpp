@@ -23,7 +23,7 @@ private:
 };
 
 bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
-    glm::vec3 oc = ray.origin - center;
+    auto oc = ray.origin - center;
     float a = glm::dot(ray.direction, ray.direction);
     float b = glm::dot(ray.direction, oc) * 2.0f;
     float c = glm::dot(oc, oc) - radius * radius;

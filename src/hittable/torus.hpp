@@ -39,11 +39,12 @@ bool Torus::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const 
     auto oc2 = glm::dot(oc, oc);
     auto R2 = pow(radius, 2.0f);
     auto r2 = pow(radius_cube, 2.0f);
-    float A = 1.0f;
-    float B = 4.0f * oc_dot_v;
-    float C = 4.0f * pow(oc_dot_v, 2.0f) + 2.0f * (R2 - r2 + oc2) - 4 * R2 * (pow(v_dot_a, 2.0f) + pow(v_dot_b, 2.0f));
-    float D = 4.0f * oc_dot_v * (R2 - r2 + oc2) - 8.0f * R2 * (v_dot_a * oc_dot_a + v_dot_b * oc_dot_b);
-    float E = pow(R2 - r2 + oc2, 2.0f) - 4.0f * R2 * (pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f));
+
+    const double A = 1.0f;
+    const double B = 4.0f * oc_dot_v;
+    const double C = 4.0f * pow(oc_dot_v, 2.0f) + 2.0f * (R2 - r2 + oc2) - 4 * R2 * (pow(v_dot_a, 2.0f) + pow(v_dot_b, 2.0f));
+    const double D = 4.0f * oc_dot_v * (R2 - r2 + oc2) - 8.0f * R2 * (v_dot_a * oc_dot_a + v_dot_b * oc_dot_b);
+    const double E = pow(R2 - r2 + oc2, 2.0f) - 4.0f * R2 * (pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f));
 
     vector<double> roots;
     equation::SolveQuarticReal({ A, B, C, D, E }, roots);
@@ -68,7 +69,20 @@ bool Torus::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const 
 void Torus::GetAABBBox() {
     auto a = axis->basis[0];
     auto b = axis->basis[1];
-    this->box = std::make_shared<AABBBox>(center - radius - radius_cube, center + radius + radius_cube);
+    auto box_left = center, box_right = center;
+    for(int i = 0; i <= 1; ++i) {
+        for(int j = 0; j <= 1; ++j) {
+            for(int k = 0; k <= 1; ++k) {
+                auto sign_i = (float)i * 2.0f - 1.0f;
+                auto sign_j = (float)j * 2.0f - 1.0f;
+                auto sign_k = (float)k * 2.0f - 1.0f;
+                auto point = center + (radius + radius_cube) * (sign_i * axis->basis[0] + sign_j * axis->basis[1]) + sign_k * radius_cube * normal;
+                box_left = utils::EleWiseMin(box_left, point);
+                box_right = utils::EleWiseMax(box_right, point);
+            }
+        }
+    }
+    this->box = std::make_shared<AABBBox>(box_left, box_right);
 }
 
 glm::vec2 Torus::GetTorusUV(glm::vec3 position) const {

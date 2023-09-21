@@ -36,33 +36,23 @@ bool ConeFace::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) con
     float v_dot_b = glm::dot(ray.direction, this->axis->basis[1]);
     float v_dot_n = glm::dot(ray.direction, normal);
     float r2_div_h2 = pow(radius, 2.0f) / pow(height, 2.0f);
-    float r2_div_h = pow(radius, 2.0f) / height;
     float A = pow(v_dot_a, 2.0f) + pow(v_dot_b, 2.0f) - r2_div_h2 * pow(v_dot_n, 2.0f);
-    float B = 2.0f * (oc_dot_a * v_dot_a + oc_dot_b * v_dot_b - r2_div_h2 * v_dot_n * oc_dot_n + r2_div_h * v_dot_n);
-    float C = pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f) - pow(radius, 2.0f) * pow(1.0f - oc_dot_n / height, 2.0f);
+    float B = 2.0f * (oc_dot_a * v_dot_a + oc_dot_b * v_dot_b + r2_div_h2 * v_dot_n * (height - oc_dot_n));
+    float C = pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f) - r2_div_h2 * pow(height - oc_dot_n, 2.0f);
     if (A == 0)  return false; //光线沿着母线方向
-    float discriminant = B * B - 4.0f * A * C;
-    if (discriminant > 0) {
-        float t1 = (-B - sqrt(discriminant)) / (2.0f * A);
-        float t2 = (-B + sqrt(discriminant)) / (2.0f * A);
-        float h1 = glm::dot(ray.PointAt(t1) - center, normal);
-        float h2 = glm::dot(ray.PointAt(t2) - center, normal);
-        if (t1 >= t_min && t1 <= t_max && h1 >= 0 && h1 <= height) {
+
+    vector<double> roots;
+    equation::SolveQuadraticReal({A, B, C}, roots);
+    std::sort(roots.begin(), roots.end());
+    for(const auto &t: roots) if(t >= t_min && t <= t_max) {
+        auto point = ray.PointAt((float)t);
+        auto h = glm::dot(point - center, normal);
+        if (h >= 0 && h <= height) {
             hit = {
-                    .t = t1,
-                    .position = ray.PointAt(t1),
-                    .normal = glm::normalize(ray.PointAt(t1) - center - h1 * normal),
-                    .tex_coord = this->GetConeFaceUV(ray.PointAt(t1)),
-                    .material = material
-            };
-            return true;
-        }
-        if (t2 >= t_min && t2 <= t_max && h2 >= 0 && h2 <= height) {
-            hit = {
-                    .t = t2,
-                    .position = ray.PointAt(t2),
-                    .normal = glm::normalize(ray.PointAt(t2) - center - h2 * normal),
-                    .tex_coord = this->GetConeFaceUV(ray.PointAt(t2)),
+                    .t = (float)t,
+                    .position = point,
+                    .normal = glm::normalize(point - center - h * normal),
+                    .tex_coord = this->GetConeFaceUV(point),
                     .material = material
             };
             return true;

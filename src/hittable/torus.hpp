@@ -36,15 +36,14 @@ bool Torus::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const 
     auto oc_dot_b = glm::dot(oc, axis->basis[1]);
     auto v_dot_a = glm::dot(ray.direction, axis->basis[0]);
     auto v_dot_b = glm::dot(ray.direction, axis->basis[1]);
-    auto oc2 = glm::dot(oc, oc);
     auto R2 = pow(radius, 2.0f);
-    auto r2 = pow(radius_cube, 2.0f);
+    auto factor = pow(radius, 2.0f) - pow(radius_cube, 2.0f) + glm::dot(oc, oc);
 
     const double A = 1.0f;
     const double B = 4.0f * oc_dot_v;
-    const double C = 4.0f * pow(oc_dot_v, 2.0f) + 2.0f * (R2 - r2 + oc2) - 4 * R2 * (pow(v_dot_a, 2.0f) + pow(v_dot_b, 2.0f));
-    const double D = 4.0f * oc_dot_v * (R2 - r2 + oc2) - 8.0f * R2 * (v_dot_a * oc_dot_a + v_dot_b * oc_dot_b);
-    const double E = pow(R2 - r2 + oc2, 2.0f) - 4.0f * R2 * (pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f));
+    const double C = 4.0f * pow(oc_dot_v, 2.0f) + 2.0f * factor - 4 * R2 * (pow(v_dot_a, 2.0f) + pow(v_dot_b, 2.0f));
+    const double D = 4.0f * oc_dot_v * factor - 8.0f * R2 * (v_dot_a * oc_dot_a + v_dot_b * oc_dot_b);
+    const double E = pow(factor, 2.0f) - 4.0f * R2 * (pow(oc_dot_a, 2.0f) + pow(oc_dot_b, 2.0f));
 
     vector<double> roots;
     equation::SolveQuarticReal({ A, B, C, D, E }, roots);

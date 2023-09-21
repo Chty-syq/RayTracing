@@ -5,6 +5,7 @@
 #pragma once
 
 #include "hittable/hittable.hpp"
+#include "common/equation.hpp"
 
 class Sphere: public Hittable {
 public:
@@ -24,33 +25,23 @@ private:
 
 bool Sphere::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
     auto oc = ray.origin - center;
-    float a = glm::dot(ray.direction, ray.direction);
-    float b = glm::dot(ray.direction, oc) * 2.0f;
-    float c = glm::dot(oc, oc) - radius * radius;
-    float discriminant = b * b - 4.0f * a * c;
-    if (discriminant > 0) {
-        float t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-        float t2 = (-b + sqrt(discriminant)) / (2.0f * a);
-        if (t1 >= t_min && t1 <= t_max) {
-            hit = {
-                    .t = t1,
-                    .position = ray.PointAt(t1),
-                    .normal = (ray.PointAt(t1) - center) / radius,
-                    .tex_coord = this->GetSphereUV(ray.PointAt(t1)),
-                    .material = material
-            };
-            return true;
-        }
-        if (t2 >= t_min && t2 <= t_max) {
-            hit = {
-                    .t = t2,
-                    .position = ray.PointAt(t2),
-                    .normal = (ray.PointAt(t2) - center) / radius,
-                    .tex_coord = this->GetSphereUV(ray.PointAt(t2)),
-                    .material = material
-            };
-            return true;
-        }
+    float A = glm::dot(ray.direction, ray.direction);
+    float B = glm::dot(ray.direction, oc) * 2.0f;
+    float C = glm::dot(oc, oc) - radius * radius;
+
+    vector<double> roots;
+    equation::SolveQuadraticReal({ A, B, C }, roots);
+    std::sort(roots.begin(), roots.end());
+    for(const auto &t : roots) if (t >= t_min && t <= t_max) {
+        auto point = ray.PointAt(float(t));
+        hit = {
+                .t = (float)t,
+                .position = point,
+                .normal = glm::normalize(point - center),
+                .tex_coord = this->GetSphereUV(point),
+                .material = material
+        };
+        return true;
     }
     return false;
 }

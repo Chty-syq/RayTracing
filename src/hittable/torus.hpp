@@ -30,7 +30,14 @@ protected:
 };
 
 bool Torus::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const {
-    auto oc = ray.origin - center;
+    auto origin = ray.origin;
+    auto distance = glm::dot(center - ray.origin, ray.direction);
+    auto diff = 0.0f;
+    if (distance > radius + radius_cube) {
+        origin += (distance - radius - radius_cube) * ray.direction;
+        diff = (distance - radius - radius_cube);
+    }
+    auto oc = origin - center;
     auto oc_dot_v = glm::dot(oc, ray.direction);
     auto oc_dot_a = glm::dot(oc, axis->basis[0]);
     auto oc_dot_b = glm::dot(oc, axis->basis[1]);
@@ -48,19 +55,22 @@ bool Torus::Hit(const Ray &ray, float t_min, float t_max, HitRecord &hit) const 
     vector<double> roots;
     equation::SolveQuarticReal({ A, B, C, D, E }, roots);
     std::sort(roots.begin(), roots.end());
-    for(const auto &t : roots) if (t >= t_min && t <= t_max) {
-        auto point = ray.PointAt(float(t));
-        auto local = this->axis->GetLocal(point - center);
-        auto direction = glm::normalize(glm::vec3(local.x, local.y, 0.0f));
-        auto center_cube = this->axis->GetWorld(direction * radius) + center;
-        hit = {
-                .t = (float)t,
-                .position = point,
-                .normal = glm::normalize(point - center_cube),
-                .tex_coord = this->GetTorusUV(point),
-                .material = material
-        };
-        return true;
+    for(const auto &root : roots) {
+        auto t = (float)root + diff;
+        if (t >= t_min && t <= t_max) {
+            auto point = ray.PointAt(float(t));
+            auto local = this->axis->GetLocal(point - center);
+            auto direction = glm::normalize(glm::vec3(local.x, local.y, 0.0f));
+            auto center_cube = this->axis->GetWorld(direction * radius) + center;
+            hit = {
+                    .t = (float) t,
+                    .position = point,
+                    .normal = glm::normalize(point - center_cube),
+                    .tex_coord = this->GetTorusUV(point),
+                    .material = material
+            };
+            return true;
+        }
     }
     return false;
 }

@@ -59,3 +59,6 @@ We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering c
 
 ![](results/cornell_box_4.png)
 
+#### Cornell-box with Graphics
+
+![](results/cornell_box_6.png)

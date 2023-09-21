@@ -8,11 +8,11 @@
         {
             "type": "circle",
             "center": [2.93, 5.478, 3.195],
-            "radius": 1,
+            "radius": 1.5,
             "normal": [0, -1, 0],
             "material": {
                 "type": "DiffuseLight",
-                "albedo": "container.jpg"
+                "albedo": [1, 1, 1]
             }
         }
     ],
@@ -125,7 +125,7 @@
             "radius_cube": 0.1,
             "normal": [0, 1, 1],
             "material": {
-                "type": "DiffuseLight",
+                "type": "Metal",
                 "albedo": "container.jpg"
             }
         }

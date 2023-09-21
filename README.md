@@ -27,7 +27,25 @@ git submodule init
 git submodule update
 ```
 
-## 3. Result
+## 3. Graphics
+
+We plan to support the rendering of the following graphics.
+
+- [x] cycle
+- [x] sphere
+- [x] triangle-mesh
+- [x] cylinder
+- [x] cone
+- [x] torus
+
+And following light source for rendering and sampling.
+
+- [x] rectangle
+- [x] cycle
+- [x] sphere
+- [ ] triangle-mesh
+
+## 4. Result
 
 We sampled $100$ rays with $800 \times 600$ viewport, and the single rendering costs 20s with release build.
 

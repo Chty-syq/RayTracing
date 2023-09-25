@@ -6,6 +6,7 @@
 #include "hittable/cylinder.hpp"
 #include "hittable/cone.hpp"
 #include "hittable/torus.hpp"
+#include "hittable/ellipsoid.hpp"
 #include "material/material_lambertian.hpp"
 #include "material/material_metal.hpp"
 #include "material/material_dielectric.hpp"

@@ -165,6 +165,13 @@ shared_ptr<Hittable> Scene::ExtractObject(const json &item) {
         auto material = ExtractMaterial(item["material"]);
         return std::make_shared<Torus>(center, radius, radius_cube, normal, material);
     }
+    else if (type == "ellipsoid") {
+        auto center = converter::Json2Vec3(item["center"]);
+        auto radius = converter::Json2Vec3(item["radius"]);
+        auto normal = converter::Json2Vec3(item["normal"]);
+        auto material = ExtractMaterial(item["material"]);
+        return std::make_shared<Ellipsoid>(center, radius, normal, material);
+    }
     return nullptr;
 }
 

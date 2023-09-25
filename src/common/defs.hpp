@@ -40,7 +40,7 @@ const float PI = (float)acos(-1);
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
-const int NUM_SAMPLE_RAYS = 1000;
+const int NUM_SAMPLE_RAYS = 100;
 
 const float T_MIN = 0.001f;
 const float T_MAX = 100.0f;

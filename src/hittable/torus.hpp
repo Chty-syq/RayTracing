@@ -7,12 +7,12 @@
 #include "common/equation.hpp"
 #include <unsupported/Eigen/Polynomials>
 
-class Torus: public Hittable {
+class Torus: public Hittable { //环面
 public:
-    float radius; // the radius of the tube
-    float radius_cube; // the radius from the center of the hole to the center of the torus tube
+    float radius; //中心点到圆管中心的半径(旋转半径)
+    float radius_cube; //圆管半径(旋转球的半径)
     glm::vec3 center;
-    glm::vec3 normal{};
+    glm::vec3 normal{}; //旋转轴
     shared_ptr<Material> material;
 
     Torus(glm::vec3 center, float radius, float radius_cube, glm::vec3 normal, const shared_ptr<Material>& material): center(center), radius(radius), radius_cube(radius_cube), material(material){
